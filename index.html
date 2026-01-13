@@ -4,459 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AS Mart - 20 Min Delivery</title>
-    <style>
-        /* Basic Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #667eea;
-            --secondary: #764ba2;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --light: #f8f9fa;
-            --dark: #343a40;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        /* Navbar */
-        .navbar {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-
-        .logo span {
-            color: var(--secondary);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .cart-icon {
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--danger);
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-
-        .hero h2 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
-        }
-
-        .delivery-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            margin-bottom: 2rem;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-            font-size: 1rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
-        }
-
-        /* Categories */
-        .category-section {
-            padding: 4rem 0;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .categories {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .category-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .category-card i {
-            font-size: 3rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        /* Products */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .product-image {
-            height: 200px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 4rem;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 0.5rem 0;
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.9rem;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--dark);
-            color: white;
-            padding: 3rem 0 1.5rem;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-links a {
-            color: #ddd;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .copyright {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #444;
-            color: #aaa;
-        }
-
-        /* QR Code Button */
-        .qr-access {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: #f0f0f0;
-            border-radius: 20px;
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            margin-left: 10px;
-            cursor: pointer;
-        }
-
-        .qr-access:hover {
-            background: #e0e0e0;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .close-modal {
-            float: right;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-        }
-
-        /* Admin Button */
-        .admin-access-btn {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            background: var(--dark);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-            display: none;
-        }
-
-        .admin-access-btn:hover {
-            background: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        /* QR Modal Specific */
-        #qrModal .modal-content {
-            text-align: center;
-            padding: 30px;
-        }
-
-        #qrModal h2 {
-            color: var(--dark);
-            margin-bottom: 20px;
-        }
-
-        #globalQrCode {
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            display: inline-block;
-            margin: 20px 0;
-            border: 2px solid #eee;
-        }
-
-        #globalUrl {
-            background: var(--light);
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            word-break: break-all;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-
-        /* Floating QR Button */
-        #floatingQRBtn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(45deg, #4CAF50, #2E7D32);
-            color: white;
-            border: none;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.3s;
-        }
-
-        #floatingQRBtn:hover {
-            transform: scale(1.1);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h2 {
-                font-size: 2rem;
-            }
-            
-            .container {
-                padding: 0 1rem;
-            }
-        }
-    </style>
+    <!-- External CSS for Vercel compatibility -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Header -->
@@ -472,12 +22,12 @@
                 <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
                 <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> Orders</a></li>
                 <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Track</a></li>
-                <li><a href="reviews.html"><i class="fas fa-star"></i> Review</li></a>
-		 <li><a href="history.html"><i class="fas fa-star"></i> Order-history</li></a>
+                <li><a href="reviews.html"><i class="fas fa-star"></i> Review</a></li>
+                <li><a href="history.html"><i class="fas fa-history"></i> Order History</a></li>
             </ul>
             
             <div class="nav-right">
-                <a href="#" onclick="showQRModal()" class="qr-access">
+                <a href="#" onclick="showQRModal(); return false;" class="qr-access">
                     <i class="fas fa-qrcode" style="color: #4CAF50;"></i>
                     Scan QR
                 </a>
@@ -503,9 +53,8 @@
             <div class="delivery-badge">
                 <i class="fas fa-bolt"></i> 20-Minute Guarantee
             </div>
-            <div style="margin-top: 2rem;">
-                <input type="text" placeholder="Search for products..." id="searchBar" 
-                       style="padding: 1rem; width: 60%; border-radius: 25px; border: none;">
+            <div class="search-container">
+                <input type="text" placeholder="Search for products..." id="searchBar">
                 <button class="btn btn-primary" onclick="searchProducts()">
                     <i class="fas fa-search"></i> Search
                 </button>
@@ -541,7 +90,7 @@
     </section>
 
     <!-- Featured Products -->
-    <section class="container" style="padding: 4rem 0;">
+    <section class="featured-products container">
         <h2 class="section-title"><i class="fas fa-bolt"></i> Quick Delivery Items</h2>
         <div class="products-grid" id="featuredProducts">
             <!-- Products loaded by JavaScript -->
@@ -549,26 +98,26 @@
     </section>
 
     <!-- How It Works -->
-    <section class="container" style="margin: 4rem 0;">
+    <section class="how-it-works container">
         <h2 class="section-title"><i class="fas fa-play-circle"></i> How It Works</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
-            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">1</div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
                 <h3>Browse & Add</h3>
                 <p>Select items from our wide range of products</p>
             </div>
-            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">2</div>
+            <div class="step-card">
+                <div class="step-number">2</div>
                 <h3>Secure Checkout</h3>
                 <p>5-minute secure payment session</p>
             </div>
-            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">3</div>
+            <div class="step-card">
+                <div class="step-number">3</div>
                 <h3>Track Live</h3>
                 <p>Real-time tracking of your order</p>
             </div>
-            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">4</div>
+            <div class="step-card">
+                <div class="step-number">4</div>
                 <h3>Fast Delivery</h3>
                 <p>Get delivery in just 20 minutes!</p>
             </div>
@@ -617,76 +166,39 @@
     <!-- QR Code Modal -->
     <div id="qrModal" class="modal">
         <div class="modal-content">
-            <h2 style="color: #333; margin-bottom: 20px;">
-                <i class="fas fa-qrcode"></i> Scan to Access
-            </h2>
+            <span class="close-modal" onclick="closeQRModal()">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-qrcode"></i> Scan to Access</h2>
             
-            <div id="globalQrCode" style="
-                padding: 20px;
-                background: white;
-                border-radius: 10px;
-                display: inline-block;
-                margin: 20px 0;
-                border: 2px solid #eee;
-            "></div>
-            
-            <p style="color: #666; margin-bottom: 15px;">
-                Scan this QR code with any device to access AS Mart
-            </p>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
-                <p style="margin: 5px 0; font-size: 14px; color: #444;">
-                    <i class="fas fa-globe"></i> Global URL:
-                </p>
-                <p id="globalUrl" style="
-                    background: white;
-                    padding: 10px;
-                    border-radius: 5px;
-                    font-family: monospace;
-                    word-break: break-all;
-                    margin: 10px 0;
-                    font-size: 14px;
-                "></p>
+            <div class="qr-display-container">
+                <div id="globalQrCode"></div>
             </div>
             
-            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                <button onclick="downloadGlobalQR()" style="
-                    background: #4CAF50;
-                    color: white;
-                    border: none;
-                    padding: 12px 25px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                ">
+            <p class="qr-instruction">Scan this QR code with any device to access AS Mart</p>
+            
+            <div class="url-container">
+                <p class="url-label"><i class="fas fa-globe"></i> Global URL:</p>
+                <p id="globalUrl" class="url-display"></p>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-download" onclick="downloadGlobalQR()">
                     <i class="fas fa-download"></i> Download QR
                 </button>
-                
-                <button onclick="closeQRModal()" style="
-                    background: #f0f0f0;
-                    color: #333;
-                    border: none;
-                    padding: 12px 25px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-weight: 600;
-                ">
+                <button class="btn-close" onclick="closeQRModal()">
                     Close
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Font Awesome -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    
-    <!-- QR Code Library -->
+    <!-- External JavaScript Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Add this before closing </body> tag in all pages -->
+    
+    <!-- Shared JavaScript Files -->
     <script src="global-qr.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- Page-specific JavaScript -->
     <script>
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -708,6 +220,8 @@
 
         function loadFeaturedProducts() {
             const container = document.getElementById('featuredProducts');
+            if (!container) return;
+            
             container.innerHTML = '';
             
             featuredProducts.forEach(product => {
@@ -729,56 +243,47 @@
             });
         }
 
-        // Cart Functions
-        let cart = JSON.parse(localStorage.getItem('asmartCart')) || [];
-
         function addToCart(productId) {
             const product = featuredProducts.find(p => p.id === productId);
             if (!product) return;
             
-            const existingItem = cart.find(item => item.id === productId);
-            
-            if (existingItem) {
-                existingItem.quantity = (existingItem.quantity || 1) + 1;
+            // Use shared cart function from script.js
+            if (typeof window.addToCartShared === 'function') {
+                window.addToCartShared(product);
             } else {
-                cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    quantity: 1
-                });
+                // Fallback if shared function not available
+                let cart = JSON.parse(localStorage.getItem('asmartCart')) || [];
+                const existingItem = cart.find(item => item.id === productId);
+                
+                if (existingItem) {
+                    existingItem.quantity = (existingItem.quantity || 1) + 1;
+                } else {
+                    cart.push({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1
+                    });
+                }
+                
+                localStorage.setItem('asmartCart', JSON.stringify(cart));
+                updateCartCount();
+                showNotification(`Added ${product.name} to cart!`, 'success');
             }
-            
-            localStorage.setItem('asmartCart', JSON.stringify(cart));
-            updateCartCount();
-            
-            showNotification(`Added ${product.name} to cart!`, 'success');
-        }
-
-        function updateCartCount() {
-            const totalItems = cart.reduce((total, item) => total + (item.quantity || 1), 0);
-            document.getElementById('cartCount').textContent = totalItems;
-        }
-
-        function goToCart() {
-            if (cart.length === 0) {
-                showNotification('Your cart is empty!', 'info');
-                return;
-            }
-            window.location.href = 'cart.html';
-        }
-
-        // Navigation Functions
-        function goToCategory(category) {
-            showNotification(`Opening ${category} category...`, 'info');
-            // In real app, this would navigate to shop page with category filter
         }
 
         function searchProducts() {
             const searchTerm = document.getElementById('searchBar').value;
             if (searchTerm.trim()) {
                 showNotification(`Searching for: ${searchTerm}`, 'info');
+                // In real app, redirect to shop page with search term
+                window.location.href = `shop.html?search=${encodeURIComponent(searchTerm)}`;
             }
+        }
+
+        function goToCategory(category) {
+            showNotification(`Opening ${category} category...`, 'info');
+            window.location.href = `shop.html?category=${category}`;
         }
 
         // QR Code Functions
@@ -787,29 +292,40 @@
             const qrContainer = document.getElementById('globalQrCode');
             const urlDisplay = document.getElementById('globalUrl');
             
+            if (!qrContainer || !urlDisplay) return;
+            
             // Clear previous QR code
             qrContainer.innerHTML = '';
             
             // Generate new QR code
-            new QRCode(qrContainer, {
-                text: currentUrl,
-                width: 200,
-                height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            // Display URL
-            urlDisplay.textContent = currentUrl;
+            try {
+                new QRCode(qrContainer, {
+                    text: currentUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                urlDisplay.textContent = currentUrl;
+            } catch (error) {
+                console.error('QR Code generation failed:', error);
+            }
         }
 
         function showQRModal() {
-            document.getElementById('qrModal').style.display = 'flex';
+            const modal = document.getElementById('qrModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                generateQRCode();
+            }
         }
 
         function closeQRModal() {
-            document.getElementById('qrModal').style.display = 'none';
+            const modal = document.getElementById('qrModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
 
         function downloadGlobalQR() {
@@ -820,6 +336,8 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 showNotification('QR Code downloaded!', 'success');
+            } else {
+                showNotification('QR Code not available for download', 'error');
             }
         }
 
@@ -836,14 +354,16 @@
 
         function showAdminAccess() {
             const adminBtn = document.getElementById('adminAccessBtn');
-            adminBtn.style.display = 'flex';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                adminBtn.style.display = 'none';
-            }, 5000);
-            
-            showNotification('Admin access enabled! Click button to login.', 'info');
+            if (adminBtn) {
+                adminBtn.style.display = 'flex';
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    adminBtn.style.display = 'none';
+                }, 5000);
+                
+                showNotification('Admin access enabled! Click button to login.', 'info');
+            }
         }
 
         function goToAdminLogin() {
@@ -856,72 +376,6 @@
             // In real app, this would show login modal or user dropdown
         }
 
-        // Notification Function
-        function showNotification(message, type = 'info') {
-            // Remove existing notification
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-            
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-                    <span>${message}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer;">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            // Add styles if not already present
-            if (!document.querySelector('#notification-styles')) {
-                const style = document.createElement('style');
-                style.id = 'notification-styles';
-                style.textContent = `
-                    .notification {
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        background: white;
-                        padding: 15px 20px;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        z-index: 2000;
-                        animation: slideInRight 0.3s ease-out;
-                        min-width: 300px;
-                        border-left: 4px solid #667eea;
-                    }
-                    .notification-success {
-                        border-left-color: #28a745;
-                    }
-                    .notification-info {
-                        border-left-color: #17a2b8;
-                    }
-                    @keyframes slideInRight {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            document.body.appendChild(notification);
-            
-            // Auto-remove after 3 seconds
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
-                }
-            }, 3000);
-        }
-
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {
             const qrModal = document.getElementById('qrModal');
@@ -930,10 +384,11 @@
             }
         });
 
-        // Prevent form submission
+        // Prevent default form submission
         document.addEventListener('submit', function(e) {
-            e.preventDefault();
-            return false;
+            if (e.target.tagName === 'FORM') {
+                e.preventDefault();
+            }
         });
     </script>
 </body>
