@@ -1,6 +1,21 @@
 {
-  "dependencies": {
-    "@supabase/auth-helpers-nextjs": "^0.15.0",
-    "@supabase/supabase-js": "^2.89.0"
-  }
+  "name": "asmart",
+  "version": "1.0.0",
+  "description": "20-minute delivery service for groceries, food, and essentials",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "deploy": "vercel --prod",
+    "dev": "npx live-server ."
+  },
+  "keywords": [
+    "delivery",
+    "ecommerce",
+    "groceries",
+    "food"
+  ],
+  "author": "AS Mart",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
 }

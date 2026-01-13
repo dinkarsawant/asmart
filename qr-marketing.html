@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Add to your existing CSS */
+        .qr-marketing {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .qr-materials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .material-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            width: 250px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .material-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .material-icon {
+            font-size: 40px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Add this section to your index.html -->
+    <section class="qr-marketing">
+        <h2>Go Global with QR Codes</h2>
+        <p style="font-size: 18px; color: #555; margin-bottom: 30px;">
+            Make your AsMart store accessible worldwide with QR codes
+        </p>
+        
+        <div class="qr-materials">
+            <div class="material-card">
+                <div class="material-icon">🍽️</div>
+                <h3>Table QR Codes</h3>
+                <p>Place on restaurant tables for instant menu access</p>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon">📱</div>
+                <h3>Mobile Access</h3>
+                <p>Customers scan with phone camera - no app needed</p>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon">🌍</div>
+                <h3>Global Reach</h3>
+                <p>Accessible from any device, anywhere in the world</p>
+            </div>
+            
+            <div class="material-card">
+                <div class="material-icon">📈</div>
+                <h3>Track Scans</h3>
+                <p>Monitor QR code performance and customer engagement</p>
+            </div>
+        </div>
+        
+        <button onclick="window.GlobalQR.showQRModal()" style="
+            background: linear-gradient(to right, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        ">
+            <i class="fas fa-qrcode"></i> Get Your Global QR Code
+        </button>
+    </section>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy AsMart - Global Access</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            background: linear-gradient(to right, #4CAF50, #45a049);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .step h3 {
+            display: inline-block;
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .step-content {
+            margin-left: 55px;
+        }
+        
+        .step-content p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .qr-preview {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        
+        .qr-preview h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        #previewQR {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-rocket"></i> Deploy AsMart Globally</h1>
+            <p>Make your website accessible worldwide via QR code</p>
+        </div>
+        
+        <div class="content">
+            <div class="step">
+                <span class="step-number">1</span>
+                <h3>Choose Deployment Platform</h3>
+                <div class="step-content">
+                    <p>Select one of these free hosting services:</p>
+                    
+                    <div class="button-group">
+                        <a href="https://vercel.com" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-bolt"></i> Deploy on Vercel (Fastest)
+                        </a>
+                        <a href="https://github.com" target="_blank" class="btn btn-secondary">
+                            <i class="fab fa-github"></i> GitHub Pages
+                        </a>
+                        <a href="https://netlify.com" target="_blank" class="btn btn-secondary">
+                            <i class="fas fa-cloud"></i> Netlify
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">2</span>
+                <h3>Upload Your Files</h3>
+                <div class="step-content">
+                    <p><strong>For Vercel (Recommended):</strong></p>
+                    <div class="code-block">
+# Install Vercel CLI<br>
+npm install -g vercel<br><br>
+# Login to Vercel<br>
+vercel login<br><br>
+# Deploy your project<br>
+vercel --prod
+                    </div>
+                    
+                    <p><strong>For GitHub Pages:</strong></p>
+                    <ul style="margin-left: 20px; color: #555;">
+                        <li>Create new GitHub repository</li>
+                        <li>Upload all project files</li>
+                        <li>Go to Settings → Pages</li>
+                        <li>Select branch: main, folder: /root</li>
+                        <li>Your site: https://[username].github.io/asmart</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">3</span>
+                <h3>Generate Global QR Code</h3>
+                <div class="step-content">
+                    <p>Once deployed, your QR code will automatically work globally:</p>
+                    
+                    <div class="qr-preview">
+                        <h3><i class="fas fa-qrcode"></i> Your Global QR Code</h3>
+                        <div id="previewQR"></div>
+                        <p style="margin-top: 20px; color: #666;">
+                            This QR code will point to your deployed website
+                        </p>
+                    </div>
+                    
+                    <p><strong>QR Code Usage:</strong></p>
+                    <ul style="margin-left: 20px; color: #555;">
+                        <li>Print and display in your restaurant/store</li>
+                        <li>Add to menus, tables, and promotional materials</li>
+                        <li>Share digitally on social media</li>
+                        <li>Include in email campaigns</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <span class="step-number">4</span>
+                <h3>Test Global Access</h3>
+                <div class="step-content">
+                    <p>Test your deployed website:</p>
+                    
+                    <div class="button-group">
+                        <button onclick="testOnMobile()" class="btn btn-primary">
+                            <i class="fas fa-mobile-alt"></i> Test on Mobile
+                        </button>
+                        <button onclick="generateTestQR()" class="btn btn-secondary">
+                            <i class="fas fa-qrcode"></i> Generate Test QR
+                        </button>
+                    </div>
+                    
+                    <p style="margin-top: 20px;">
+                        <strong>Note:</strong> Your website will be accessible from any device, 
+                        anywhere in the world by scanning the QR code.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <a href="index.html" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="qr-generator.html" class="btn btn-secondary">
+                    <i class="fas fa-qrcode"></i> Open QR Generator
+                </a>
+                <a href="qr-scanner.html" class="btn btn-secondary">
+                    <i class="fas fa-camera"></i> Open QR Scanner
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>AsMart Global QR Code System &copy; 2026</p>
+            <p style="margin-top: 10px; font-size: 14px;">
+                Once deployed, your website will be accessible worldwide via QR code
+            </p>
+        </div>
+    </div>
+    
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <script>
+        // Generate preview QR code
+        const previewQR = new QRCode(document.getElementById("previewQR"), {
+            text: "https://asmart-global.vercel.app",
+            width: 180,
+            height: 180,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        function testOnMobile() {
+            // Create a QR code for testing on mobile
+            const testUrl = window.location.origin;
+            alert(`Open this URL on your mobile: ${testUrl}\n\nOr scan the QR code above!`);
+        }
+        
+        function generateTestQR() {
+            const testUrl = window.location.origin;
+            const canvas = document.querySelector('#previewQR canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = `AsMart-Test-QR.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+        
+        // Update QR code with current URL
+        window.onload = function() {
+            const currentUrl = window.location.origin;
+            document.getElementById("previewQR").innerHTML = "";
+            
+            new QRCode(document.getElementById("previewQR"), {
+                text: currentUrl,
+                width: 180,
+                height: 180,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        };
+    </script>
+</body>
+</html>
