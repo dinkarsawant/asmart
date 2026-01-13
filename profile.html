@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - AS Mart</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary), var(--orange-dark));
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+            border: 4px solid white;
+        }
+        
+        .profile-tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .profile-tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .profile-tab.active {
+            color: var(--primary);
+        }
+        
+        .profile-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+        
+        .profile-content {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .profile-section {
+            display: none;
+        }
+        
+        .profile-section.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .order-history {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .order-item:hover {
+            background: #e9ecef;
+        }
+        
+        .order-info h4 {
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .order-meta {
+            display: flex;
+            gap: 1rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .order-status {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--light);
+        }
+        
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-preparing { background: #fff3cd; color: #856404; }
+        .status-pending { background: #cce5ff; color: #004085; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AS <span>Mart</span></h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+                <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Track</a></li>
+                <li><a href="reviews.html"><i class="fas fa-star"></i> Reviews</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <div class="cart-icon" onclick="location.href='cart.html'">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                <div class="user-profile" id="userProfile">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="profile-container">
+        <div class="profile-header" id="profileHeader">
+            <!-- Will be populated by JavaScript -->
+        </div>
+        
+        <div class="profile-tabs">
+            <button class="profile-tab active" onclick="switchTab('personal')">
+                <i class="fas fa-user"></i> Personal Info
+            </button>
+            <button class="profile-tab" onclick="switchTab('orders')">
+                <i class="fas fa-clipboard-list"></i> Order History
+            </button>
+            <button class="profile-tab" onclick="switchTab('security')">
+                <i class="fas fa-shield-alt"></i> Security
+            </button>
+            <button class="profile-tab" onclick="switchTab('preferences')">
+                <i class="fas fa-cog"></i> Preferences
+            </button>
+        </div>
+        
+        <div class="profile-content">
+            <!-- Personal Info Tab -->
+            <div id="personalTab" class="profile-section active">
+                <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Personal Information</h3>
+                <form id="personalForm" onsubmit="return updateProfile(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control" id="profileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" class="form-control" id="profileEmail" disabled>
+                            <small style="color: var(--gray);">Email cannot be changed</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" class="form-control" id="profilePhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Date of Birth (Optional)</label>
+                            <input type="date" class="form-control" id="profileDob">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea class="form-control" id="profileAddress" rows="3" required></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Order History Tab -->
+            <div id="ordersTab" class="profile-section">
+                <h3 style="color: var(--primary); margin-bottom: 1.5rem;">My Orders</h3>
+                <div id="orderStats" class="stats-grid"></div>
+                <div id="orderHistory" class="order-history"></div>
+                <div id="emptyOrders" class="empty-state" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h3>No Orders Yet</h3>
+                    <p>You haven't placed any orders yet.</p>
+                    <button class="btn btn-primary" onclick="location.href='shop.html'" style="margin-top: 1rem;">
+                        Start Shopping
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Security Tab -->
+            <div id="securityTab" class="profile-section">
+                <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Security Settings</h3>
+                <form id="passwordForm" onsubmit="return changePassword(event)">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <small style="color: var(--gray);">Minimum 6 characters</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" class="form-control" id="confirmPassword" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Preferences Tab -->
+            <div id="preferencesTab" class="profile-section">
+                <h3 style="color: var(--primary); margin-bottom: 1.5rem;">Preferences</h3>
+                <form id="preferencesForm" onsubmit="return savePreferences(event)">
+                    <div class="form-group">
+                        <label>Notification Preferences</label>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="notifyOrders" checked>
+                                <span>Order updates & delivery notifications</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="notifyPromotions" checked>
+                                <span>Promotional offers & discounts</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="notifyNewsletter" checked>
+                                <span>Newsletter & updates</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                                <input type="checkbox" id="notifySMS">
+                                <span>SMS notifications</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Preferred Delivery Time</label>
+                        <select class="form-control" id="preferredTime">
+                            <option value="any">Any time</option>
+                            <option value="morning">Morning (8 AM - 12 PM)</option>
+                            <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                            <option value="evening">Evening (4 PM - 8 PM)</option>
+                            <option value="night">Night (8 PM - 10 PM)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Language Preference</label>
+                        <select class="form-control" id="languagePref">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="hi">Hindi</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>AS Mart</h3>
+                    <p>Your trusted 20-minute delivery partner for all daily needs.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html">Shop Now</a></li>
+                        <li><a href="orders.html">My Orders</a></li>
+                        <li><a href="tracking.html">Track Order</a></li>
+                        <li><a href="reviews.html">Leave Review</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-envelope"></i> support@asmart.com</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 AS Mart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let originalUserData = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            if (!isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Load user data
+            loadUserProfile();
+            
+            // Load order history
+            loadOrderHistory();
+            
+            // Update cart count
+            updateCartCount();
+            
+            // Setup user profile dropdown
+            setupUserProfile();
+        });
+        
+        function loadUserProfile() {
+            const user = getCurrentUser();
+            originalUserData = { ...user };
+            
+            // Update header
+            document.getElementById('profileHeader').innerHTML = `
+                <div class="profile-avatar" style="background: linear-gradient(135deg, var(--primary), var(--orange-dark));">
+                    ${user.avatar}
+                </div>
+                <h2 style="margin-bottom: 0.5rem;">${user.name}</h2>
+                <p style="opacity: 0.9;">${user.email}</p>
+                ${user.role === 'host' ? `
+                    <div style="margin-top: 1rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 20px; display: inline-block;">
+                        <i class="fas fa-store"></i> Shop Host
+                    </div>
+                ` : ''}
+            `;
+            
+            // Populate form
+            document.getElementById('profileName').value = user.name || '';
+            document.getElementById('profileEmail').value = user.email || '';
+            document.getElementById('profilePhone').value = user.phone || '';
+            document.getElementById('profileAddress').value = user.address || '';
+            
+            if (user.dob) {
+                document.getElementById('profileDob').value = user.dob;
+            }
+            
+            // Load preferences
+            if (user.preferences) {
+                const prefs = user.preferences;
+                document.getElementById('notifyOrders').checked = prefs.notifyOrders !== false;
+                document.getElementById('notifyPromotions').checked = prefs.notifyPromotions !== false;
+                document.getElementById('notifyNewsletter').checked = prefs.notifyNewsletter !== false;
+                document.getElementById('notifySMS').checked = prefs.notifySMS || false;
+                document.getElementById('preferredTime').value = prefs.preferredTime || 'any';
+                document.getElementById('languagePref').value = prefs.languagePref || 'en';
+            }
+        }
+        
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.profile-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Activate selected tab
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+        
+        function updateProfile(event) {
+            event.preventDefault();
+            
+            const updatedData = {
+                name: document.getElementById('profileName').value,
+                phone: document.getElementById('profilePhone').value,
+                address: document.getElementById('profileAddress').value
+            };
+            
+            const dob = document.getElementById('profileDob').value;
+            if (dob) {
+                updatedData.dob = dob;
+            }
+            
+            const result = updateUserProfile(updatedData);
+            
+            if (result.success) {
+                alert('Profile updated successfully!');
+                loadUserProfile(); // Reload profile data
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+            
+            return false;
+        }
+        
+        function resetForm() {
+            if (confirm('Reset all changes?')) {
+                loadUserProfile();
+            }
+        }
+        
+        function changePassword(event) {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validation
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all password fields');
+                return false;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('New password must be at least 6 characters');
+                return false;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match');
+                return false;
+            }
+            
+            // Get users from storage
+            const users = getUsers();
+            const user = getCurrentUser();
+            
+            // Verify current password
+            if (users[user.email] && users[user.email].password !== currentPassword) {
+                alert('Current password is incorrect');
+                return false;
+            }
+            
+            // Update password
+            users[user.email].password = newPassword;
+            localStorage.setItem('asmart_users', JSON.stringify(users));
+            
+            alert('Password changed successfully!');
+            document.getElementById('passwordForm').reset();
+            
+            return false;
+        }
+        
+        function savePreferences(event) {
+            event.preventDefault();
+            
+            const preferences = {
+                notifyOrders: document.getElementById('notifyOrders').checked,
+                notifyPromotions: document.getElementById('notifyPromotions').checked,
+                notifyNewsletter: document.getElementById('notifyNewsletter').checked,
+                notifySMS: document.getElementById('notifySMS').checked,
+                preferredTime: document.getElementById('preferredTime').value,
+                languagePref: document.getElementById('languagePref').value
+            };
+            
+            const result = updateUserProfile({ preferences });
+            
+            if (result.success) {
+                alert('Preferences saved successfully!');
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+            
+            return false;
+        }
+        
+        function loadOrderHistory() {
+            const orders = getUserOrders();
+            
+            // Update stats
+            const totalOrders = orders.length;
+            const deliveredOrders = orders.filter(o => 
+                (o.currentStatus || o.status).toLowerCase() === 'delivered').length;
+            const totalSpent = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+            
+            document.getElementById('orderStats').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${totalOrders}</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${deliveredOrders}</div>
+                    <div class="stat-label">Orders Delivered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">$${totalSpent.toFixed(2)}</div>
+                    <div class="stat-label">Total Spent</div>
+                </div>
+            `;
+            
+            // Display orders
+            const orderHistory = document.getElementById('orderHistory');
+            const emptyOrders = document.getElementById('emptyOrders');
+            
+            if (orders.length === 0) {
+                orderHistory.style.display = 'none';
+                emptyOrders.style.display = 'block';
+                return;
+            }
+            
+            emptyOrders.style.display = 'none';
+            orderHistory.style.display = 'flex';
+            
+            orderHistory.innerHTML = orders.slice(0, 10).map(order => {
+                const status = order.currentStatus || order.status || 'Pending';
+                const statusClass = getStatusClass(status);
+                
+                return `
+                    <div class="order-item" onclick="viewOrder('${order.orderId}')" style="cursor: pointer;">
+                        <div class="order-info">
+                            <h4>Order #${order.orderId}</h4>
+                            <div class="order-meta">
+                                <span>${new Date(order.orderDate || order.timestamp).toLocaleDateString()}</span>
+                                <span>$${order.total?.toFixed(2) || '0.00'}</span>
+                                <span>${order.items?.length || 0} items</span>
+                            </div>
+                        </div>
+                        <div class="order-status ${statusClass}">${status}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getStatusClass(status) {
+            const statusMap = {
+                'delivered': 'status-delivered',
+                'Delivered': 'status-delivered',
+                'preparing': 'status-preparing',
+                'Preparing': 'status-preparing',
+                'ready': 'status-preparing',
+                'Ready': 'status-preparing',
+                'pending': 'status-pending',
+                'Pending': 'status-pending',
+                'Order Placed': 'status-pending'
+            };
+            return statusMap[status.toLowerCase()] || 'status-pending';
+        }
+        
+        function viewOrder(orderId) {
+            window.location.href = `order-details.html?id=${orderId}`;
+        }
+        
+        function setupUserProfile() {
+            const user = getCurrentUser();
+            const userProfile = document.getElementById('userProfile');
+            
+            userProfile.innerHTML = `
+                <div class="user-avatar" style="background: var(--primary); cursor: pointer;">
+                    ${user.avatar}
+                </div>
+                <span style="cursor: pointer;">${user.name}</span>
+                <div class="user-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; padding: 0.5rem 0;">
+                    <a href="profile.html" style="display: block; padding: 0.75rem 1.5rem; color: var(--dark); text-decoration: none; transition: background 0.3s;">
+                        <i class="fas fa-user" style="margin-right: 0.5rem;"></i> Profile
+                    </a>
+                    <a href="orders.html" style="display: block; padding: 0.75rem 1.5rem; color: var(--dark); text-decoration: none; transition: background 0.3s;">
+                        <i class="fas fa-clipboard-list" style="margin-right: 0.5rem;"></i> My Orders
+                    </a>
+                    ${user.role === 'host' ? `
+                        <a href="host-dashboard.html" style="display: block; padding: 0.75rem 1.5rem; color: var(--dark); text-decoration: none; transition: background 0.3s;">
+                            <i class="fas fa-store" style="margin-right: 0.5rem;"></i> Host Dashboard
+                        </a>
+                    ` : ''}
+                    <hr style="margin: 0.5rem 0; border-color: #eee;">
+                    <a href="#" onclick="logout()" style="display: block; padding: 0.75rem 1.5rem; color: var(--danger); text-decoration: none; transition: background 0.3s;">
+                        <i class="fas fa-sign-out-alt" style="margin-right: 0.5rem;"></i> Logout
+                    </a>
+                </div>
+            `;
+            
+            // Toggle dropdown
+            userProfile.addEventListener('click', function(e) {
+                if (e.target.closest('.user-avatar, .user-profile span')) {
+                    const dropdown = this.querySelector('.user-dropdown');
+                    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!userProfile.contains(e.target)) {
+                    const dropdown = userProfile.querySelector('.user-dropdown');
+                    if (dropdown) dropdown.style.display = 'none';
+                }
+            });
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                logoutUser();
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = totalItems;
+            }
+        }
+    </script>
+</body>
+</html>

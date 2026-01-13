@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AS Mart</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-container {
+            max-width: 500px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-logo i {
+            font-size: 3rem;
+            color: var(--primary);
+        }
+        
+        .auth-logo h1 {
+            font-size: 2.5rem;
+            margin: 0;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .auth-tab.active {
+            color: var(--primary);
+        }
+        
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .role-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .role-option {
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .role-option:hover {
+            border-color: var(--primary-light);
+            background: #f8f9fa;
+        }
+        
+        .role-option.selected {
+            border-color: var(--primary);
+            background: rgba(255, 107, 0, 0.1);
+        }
+        
+        .role-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .role-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .role-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .demo-credentials {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .demo-header {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .demo-account {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .demo-account strong {
+            color: var(--dark);
+        }
+        
+        @media (max-width: 768px) {
+            .auth-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+            
+            .role-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            border-left: 4px solid #c62828;
+        }
+        
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            border-left: 4px solid #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AS <span style="color: var(--primary);">Mart</span></h1>
+            </div>
+            <p style="color: #666; font-size: 1.1rem;">Your 20-minute delivery partner</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login')">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <button class="auth-tab" onclick="switchTab('register')">
+                <i class="fas fa-user-plus"></i> Register
+            </button>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form active">
+            <div class="error-message" id="loginError"></div>
+            <div class="success-message" id="loginSuccess"></div>
+            
+            <form id="loginFormElement" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" class="form-control" id="loginEmail" required 
+                               placeholder="Enter your email">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="form-control" id="loginPassword" required 
+                               placeholder="Enter your password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe" style="margin: 0; color: #666;">Remember me</label>
+                    </div>
+                    <a href="#" style="color: var(--primary); text-decoration: none;">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </form>
+            
+            <div class="demo-credentials">
+                <div class="demo-header">Demo Accounts:</div>
+                <div class="demo-account">
+                    <strong>Customer:</strong> user@example.com / user123
+                </div>
+                <div class="demo-account">
+                    <strong>Host (Shop):</strong> shop@freshmart.com / host123
+                </div>
+                <div class="demo-account">
+                    <strong>Admin:</strong> admin@asmart.com / admin123
+                </div>
+            </div>
+            
+            <div class="form-footer">
+                Don't have an account? <a href="#" onclick="switchTab('register')">Sign up here</a>
+            </div>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="registerForm" class="auth-form">
+            <div class="error-message" id="registerError"></div>
+            <div class="success-message" id="registerSuccess"></div>
+            
+            <form id="registerFormElement" onsubmit="return handleRegister(event)">
+                <div class="role-selection">
+                    <div class="role-option" onclick="selectRole('customer')" id="customerRole">
+                        <div class="role-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="role-name">Customer</div>
+                        <div class="role-desc">Place orders & track deliveries</div>
+                    </div>
+                    
+                    <div class="role-option" onclick="selectRole('host')" id="hostRole">
+                        <div class="role-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div class="role-name">Host</div>
+                        <div class="role-desc">Manage shop & fulfill orders</div>
+                    </div>
+                </div>
+                <input type="hidden" id="userRole" name="role" value="customer" required>
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" class="form-control" id="registerName" required 
+                               placeholder="Enter your full name">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" class="form-control" id="registerEmail" required 
+                               placeholder="Enter your email">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" class="form-control" id="registerPhone" required 
+                               placeholder="Enter your phone number">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <textarea class="form-control" id="registerAddress" rows="2" required 
+                                  placeholder="Enter your address"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Shop details (only for hosts) -->
+                <div id="shopDetails" style="display: none;">
+                    <h4 style="color: var(--primary); margin: 1.5rem 0 1rem 0;">
+                        <i class="fas fa-store"></i> Shop Details
+                    </h4>
+                    
+                    <div class="form-group">
+                        <label>Shop Name</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-signature"></i>
+                            <input type="text" class="form-control" id="shopName" 
+                                   placeholder="Enter your shop name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Shop Address</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <textarea class="form-control" id="shopAddress" rows="2" 
+                                      placeholder="Enter your shop address"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Shop Type</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-tag"></i>
+                            <select class="form-control" id="shopType">
+                                <option value="">Select shop type</option>
+                                <option value="Supermarket">Supermarket</option>
+                                <option value="Grocery Store">Grocery Store</option>
+                                <option value="Convenience Store">Convenience Store</option>
+                                <option value="Vegetable Market">Vegetable Market</option>
+                                <option value="Fruit Store">Fruit Store</option>
+                                <option value="Bakery">Bakery</option>
+                                <option value="Dairy Shop">Dairy Shop</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="form-control" id="registerPassword" required 
+                               placeholder="Create a password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('registerPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small style="color: #666; font-size: 0.85rem;">
+                        Minimum 6 characters
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="form-control" id="registerConfirmPassword" required 
+                               placeholder="Confirm your password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('registerConfirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                        <input type="checkbox" id="termsAgreement" required>
+                        <label for="termsAgreement" style="margin: 0; color: #666; font-size: 0.9rem;">
+                            I agree to the <a href="#" style="color: var(--primary);">Terms & Conditions</a> 
+                            and <a href="#" style="color: var(--primary);">Privacy Policy</a>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+            
+            <div class="form-footer">
+                Already have an account? <a href="#" onclick="switchTab('login')">Sign in here</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let currentTab = 'login';
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tabs
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+        
+        function selectRole(role) {
+            const customerRole = document.getElementById('customerRole');
+            const hostRole = document.getElementById('hostRole');
+            const shopDetails = document.getElementById('shopDetails');
+            const roleInput = document.getElementById('userRole');
+            
+            if (role === 'customer') {
+                customerRole.classList.add('selected');
+                hostRole.classList.remove('selected');
+                shopDetails.style.display = 'none';
+                roleInput.value = 'customer';
+                
+                // Clear required for shop fields
+                document.getElementById('shopName').required = false;
+                document.getElementById('shopAddress').required = false;
+                document.getElementById('shopType').required = false;
+            } else {
+                customerRole.classList.remove('selected');
+                hostRole.classList.add('selected');
+                shopDetails.style.display = 'block';
+                roleInput.value = 'host';
+                
+                // Set required for shop fields
+                document.getElementById('shopName').required = true;
+                document.getElementById('shopAddress').required = true;
+                document.getElementById('shopType').required = true;
+            }
+        }
+        
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = event.target.closest('button');
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+        
+        function showMessage(elementId, message, isError = true) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            
+            if (isError) {
+                element.className = 'error-message';
+            } else {
+                element.className = 'success-message';
+            }
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Validate inputs
+            if (!email || !password) {
+                showMessage('loginError', 'Please fill in all fields');
+                return false;
+            }
+            
+            // Call auth.js login function
+            const result = loginUser(email, password);
+            
+            if (result.success) {
+                showMessage('loginSuccess', result.message, false);
+                
+                // Redirect based on user role
+                setTimeout(() => {
+                    const user = getCurrentUser();
+                    if (user.role === 'host') {
+                        window.location.href = 'host-dashboard.html';
+                    } else if (user.role === 'admin') {
+                        window.location.href = 'admin-dashboard.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 1000);
+            } else {
+                showMessage('loginError', result.message);
+            }
+            
+            return false;
+        }
+        
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const address = document.getElementById('registerAddress').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const role = document.getElementById('userRole').value;
+            
+            // Validation
+            if (!name || !email || !phone || !address || !password || !confirmPassword) {
+                showMessage('registerError', 'Please fill in all required fields');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                showMessage('registerError', 'Password must be at least 6 characters');
+                return false;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('registerError', 'Passwords do not match');
+                return false;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('registerError', 'Please enter a valid email address');
+                return false;
+            }
+            
+            // Prepare user data
+            const userData = {
+                email: email,
+                password: password,
+                name: name,
+                phone: phone,
+                address: address,
+                role: role
+            };
+            
+            // Add shop details if host
+            if (role === 'host') {
+                const shopName = document.getElementById('shopName').value;
+                const shopAddress = document.getElementById('shopAddress').value;
+                const shopType = document.getElementById('shopType').value;
+                
+                if (!shopName || !shopAddress || !shopType) {
+                    showMessage('registerError', 'Please fill in all shop details');
+                    return false;
+                }
+                
+                userData.shopName = shopName;
+                userData.shopAddress = shopAddress;
+                userData.shopType = shopType;
+                userData.shopPhone = phone;
+                userData.shopRating = 4.0; // Default rating
+            }
+            
+            // Call auth.js register function
+            const result = registerUser(userData);
+            
+            if (result.success) {
+                showMessage('registerSuccess', 'Registration successful! Please login.', false);
+                
+                // Auto login after registration
+                setTimeout(() => {
+                    const loginResult = loginUser(email, password);
+                    if (loginResult.success) {
+                        const user = getCurrentUser();
+                        if (user.role === 'host') {
+                            window.location.href = 'host-dashboard.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    } else {
+                        switchTab('login');
+                        document.getElementById('loginEmail').value = email;
+                        document.getElementById('loginPassword').value = password;
+                    }
+                }, 1500);
+            } else {
+                showMessage('registerError', result.message);
+            }
+            
+            return false;
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select default role
+            selectRole('customer');
+            
+            // Check if user is already logged in
+            if (isAuthenticated()) {
+                const user = getCurrentUser();
+                if (user.role === 'host') {
+                    window.location.href = 'host-dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

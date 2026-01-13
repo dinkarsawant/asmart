@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS Mart - 20 Min Delivery</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        /* Admin Access Button Styles - Hidden by default */
+        .admin-access-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            display: none; /* Hidden by default */
+        }
+        
+        .admin-access-btn:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .admin-access-btn i {
+            font-size: 16px;
+        }
+        
+        /* Admin Shortcut Instructions */
+        .admin-shortcut-hint {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            max-width: 200px;
+            display: none;
+            z-index: 9998;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .admin-shortcut-hint.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="navbar container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AS <span>Mart</span></h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+                <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Track</a></li>
+                <li><a href="reviews.html"><i class="fas fa-star"></i> Reviews</a></li>
+                <li><a href="history.html"><i class="fas fa-history"></i> Order History</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <div class="cart-icon" onclick="location.href='cart.html'">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">U</div>
+                    <span>Guest</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Get Anything Delivered in 20 Minutes!</h2>
+            <p>Groceries, Medicines, Electronics, Food & more delivered at lightning speed</p>
+            <div class="delivery-badge">
+                <i class="fas fa-bolt"></i> 20-Minute Guarantee
+            </div>
+            <div style="margin-top: 2rem;">
+                <input type="text" placeholder="Search for products..." id="searchBar" 
+                       style="padding: 1rem; width: 60%; border-radius: 25px; border: none;">
+                <button class="btn btn-primary" style="margin-left: 1rem;">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="category-section container">
+        <h2 class="section-title"><i class="fas fa-list"></i> Shop by Category</h2>
+        <div class="categories">
+            <div class="category-card" onclick="filterCategory('groceries')">
+                <i class="fas fa-shopping-basket"></i>
+                <h3>Groceries</h3>
+            </div>
+            <div class="category-card" onclick="filterCategory('food')">
+                <i class="fas fa-utensils"></i>
+                <h3>Food</h3>
+            </div>
+            <div class="category-card" onclick="filterCategory('pharmacy')">
+                <i class="fas fa-pills"></i>
+                <h3>Pharmacy</h3>
+            </div>
+            <div class="category-card" onclick="filterCategory('electronics')">
+                <i class="fas fa-laptop"></i>
+                <h3>Electronics</h3>
+            </div>
+            <div class="category-card" onclick="filterCategory('home')">
+                <i class="fas fa-home"></i>
+                <h3>Home & Living</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="container">
+        <h2 class="section-title"><i class="fas fa-bolt"></i> Quick Delivery Items</h2>
+        <div class="products-grid" id="featuredProducts">
+            <!-- Products will be loaded here -->
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="container" style="margin: 4rem 0;">
+        <h2 class="section-title"><i class="fas fa-play-circle"></i> How It Works</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem;">
+            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px;">
+                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">1</div>
+                <h3>Browse & Add</h3>
+                <p>Select items from our wide range of products</p>
+            </div>
+            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px;">
+                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">2</div>
+                <h3>Secure Checkout</h3>
+                <p>5-minute secure payment session</p>
+            </div>
+            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px;">
+                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">3</div>
+                <h3>Track Live</h3>
+                <p>Real-time tracking of your order</p>
+            </div>
+            <div style="text-align: center; padding: 2rem; background: white; border-radius: 15px;">
+                <div style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;">4</div>
+                <h3>Fast Delivery</h3>
+                <p>Get delivery in just 20 minutes!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>AS Mart</h3>
+                    <p>Your trusted 20-minute delivery partner for all daily needs.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html">Shop Now</a></li>
+                        <li><a href="orders.html">My Orders</a></li>
+                        <li><a href="tracking.html">Track Order</a></li>
+                        <li><a href="reviews.html">Leave Review</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-envelope"></i> support@asmart.com</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 AS Mart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Access Button (Hidden by default, appears with keyboard shortcut) -->
+    <button class="admin-access-btn" id="adminAccessBtn" onclick="goToAdminLogin()">
+        <i class="fas fa-user-shield"></i> Admin Access
+    </button>
+    
+    <div class="admin-shortcut-hint" id="adminShortcutHint">
+        Press <strong>Ctrl + Shift + A</strong> to access admin panel
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2>Login to AS Mart</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p style="margin-top: 1rem; text-align: center;">
+                New user? <a href="register.html" style="color: var(--primary);">Register here</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/products.js"></script>
+    
+    <!-- Admin Storage Functions -->
+    <script>
+        // Admin storage functions (for orders)
+        function saveOrderToAdmin(orderData) {
+            try {
+                // Get existing orders or initialize empty array
+                const orders = JSON.parse(localStorage.getItem('asmartOrders')) || [];
+                
+                // Add new order with timestamp and ID
+                const newOrder = {
+                    id: Date.now() + Math.floor(Math.random() * 1000), // More unique ID
+                    ...orderData,
+                    date: new Date().toLocaleString('en-IN'),
+                    status: 'Pending',
+                    orderNumber: 'ASM' + Date.now().toString().slice(-6)
+                };
+                
+                orders.push(newOrder);
+                
+                // Save back to localStorage
+                localStorage.setItem('asmartOrders', JSON.stringify(orders));
+                
+                console.log('Order saved to admin panel:', newOrder);
+                return true;
+            } catch (error) {
+                console.error('Error saving order:', error);
+                return false;
+            }
+        }
+        
+        // Function to save cart items to localStorage
+        function saveCartToStorage(cartItems) {
+            localStorage.setItem('asmartCart', JSON.stringify(cartItems));
+        }
+        
+        // Function to load cart from localStorage
+        function loadCartFromStorage() {
+            const cartJson = localStorage.getItem('asmartCart');
+            return cartJson ? JSON.parse(cartJson) : [];
+        }
+        
+        // Function to get cart total
+        function getCartTotal() {
+            const cart = loadCartFromStorage();
+            return cart.reduce((total, item) => {
+                return total + (parseFloat(item.price) * (item.quantity || 1));
+            }, 0);
+        }
+        
+        // Function to get cart items
+        function getCartItems() {
+            return loadCartFromStorage();
+        }
+        
+        // Admin access functions
+        function showAdminAccess() {
+            const adminBtn = document.getElementById('adminAccessBtn');
+            const hint = document.getElementById('adminShortcutHint');
+            
+            adminBtn.style.display = 'flex';
+            hint.classList.add('show');
+            
+            // Auto-hide hint after 5 seconds
+            setTimeout(() => {
+                hint.classList.remove('show');
+            }, 5000);
+            
+            // Auto-hide button after 10 seconds
+            setTimeout(() => {
+                adminBtn.style.display = 'none';
+            }, 10000);
+        }
+        
+        function goToAdminLogin() {
+            window.location.href = 'admin-login.html';
+        }
+        
+        // Setup admin keyboard shortcut
+        function setupAdminShortcut() {
+            document.addEventListener('keydown', function(e) {
+                // Ctrl + Shift + A
+                if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                    e.preventDefault();
+                    showAdminAccess();
+                }
+                
+                // Alt + Shift + A (alternative shortcut)
+                if (e.altKey && e.shiftKey && e.key === 'A') {
+                    e.preventDefault();
+                    showAdminAccess();
+                }
+            });
+        }
+        
+        // Initialize admin functions
+        document.addEventListener('DOMContentLoaded', function() {
+            setupAdminShortcut();
+            
+            // Add admin hint on page load (only show for 3 seconds)
+            setTimeout(() => {
+                const hint = document.getElementById('adminShortcutHint');
+                hint.classList.add('show');
+                setTimeout(() => {
+                    hint.classList.remove('show');
+                }, 3000);
+            }, 2000);
+        });
+    </script>
+    
+    <!-- Order Placement Functions -->
+    <script>
+        // Function to place order (call this from your checkout page)
+        function placeOrderOnCheckout(customerData, items, total) {
+            // Validate data
+            if (!customerData || !customerData.name || !customerData.phone || !customerData.address) {
+                alert('Please fill in all customer details');
+                return false;
+            }
+            
+            if (!items || items.length === 0) {
+                alert('Your cart is empty');
+                return false;
+            }
+            
+            // Prepare order data
+            const orderData = {
+                customerName: customerData.name.trim(),
+                customerPhone: customerData.phone.trim(),
+                customerEmail: customerData.email ? customerData.email.trim() : 'Not provided',
+                deliveryAddress: customerData.address.trim(),
+                items: items,
+                total: total.toFixed(2),
+                paymentMethod: customerData.paymentMethod || 'Cash on Delivery',
+                deliveryNotes: customerData.notes || 'No special instructions'
+            };
+            
+            // Save to admin system
+            const success = saveOrderToAdmin(orderData);
+            
+            if (success) {
+                // Clear cart after successful order
+                localStorage.removeItem('asmartCart');
+                
+                // Update cart count
+                updateCartCount();
+                
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        // Function to update cart count in header
+        function updateCartCount() {
+            const cart = loadCartFromStorage();
+            const cartCount = cart.reduce((count, item) => count + (item.quantity || 1), 0);
+            
+            const cartCountElement = document.querySelector('.cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = cartCount;
+            }
+        }
+        
+        // Initialize cart count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            loadFeaturedProducts();
+            
+            // Check user authentication
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    document.querySelector('.user-avatar').textContent = 
+                        user.email.charAt(0).toUpperCase();
+                    document.querySelector('.user-profile span').textContent = 
+                        user.email.split('@')[0];
+                }
+            });
+            
+            // Open login modal when clicking user profile
+            document.getElementById('userProfile').addEventListener('click', function() {
+                if (!firebase.auth().currentUser) {
+                    document.getElementById('loginModal').style.display = 'flex';
+                }
+            });
+            
+            // Sample featured products (replace with your actual products)
+            function loadFeaturedProducts() {
+                const featuredProducts = [
+                    { id: 1, name: "Fresh Milk 1L", price: 60, category: "groceries", image: "milk.jpg" },
+                    { id: 2, name: "Bread Loaf", price: 35, category: "groceries", image: "bread.jpg" },
+                    { id: 3, name: "Eggs (12 pcs)", price: 80, category: "groceries", image: "eggs.jpg" },
+                    { id: 4, name: "Apple (1 kg)", price: 120, category: "groceries", image: "apple.jpg" }
+                ];
+                
+                const productsGrid = document.getElementById('featuredProducts');
+                if (productsGrid) {
+                    featuredProducts.forEach(product => {
+                        const productHTML = `
+                            <div class="product-card">
+                                <div class="product-image">
+                                    <img src="images/${product.image || 'default.jpg'}" alt="${product.name}">
+                                </div>
+                                <div class="product-info">
+                                    <h3>${product.name}</h3>
+                                    <p class="product-price">₹${product.price}</p>
+                                    <button class="btn btn-primary btn-sm" onclick="addToCart(${product.id})">
+                                        <i class="fas fa-cart-plus"></i> Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        productsGrid.innerHTML += productHTML;
+                    });
+                }
+            }
+        });
+        
+        // Add to cart function
+        function addToCart(productId) {
+            // This is a sample function - replace with your actual add to cart logic
+            alert('Product added to cart!');
+            // Update cart count
+            const currentCount = parseInt(document.querySelector('.cart-count').textContent);
+            document.querySelector('.cart-count').textContent = currentCount + 1;
+        }
+        
+        function closeModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+        
+        function filterCategory(category) {
+            window.location.href = `shop.html?category=${category}`;
+        }
+        
+        // User authentication functions
+        function isAuthenticated() {
+            return firebase.auth().currentUser !== null;
+        }
+        
+        function getCurrentUser() {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                return {
+                    name: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    avatar: user.email.charAt(0).toUpperCase()
+                };
+            }
+            return null;
+        }
+        
+        function logoutUser() {
+            return firebase.auth().signOut();
+        }
+        
+        // Update user profile display
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!isAuthenticated()) {
+                const userProfile = document.getElementById('userProfile');
+                if (userProfile) {
+                    userProfile.innerHTML = `
+                        <a href="login.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                            <div class="user-avatar" style="background: var(--primary);">G</div>
+                            <span>Guest</span>
+                        </a>
+                    `;
+                }
+            } else {
+                const user = getCurrentUser();
+                const userProfile = document.getElementById('userProfile');
+                if (userProfile) {
+                    userProfile.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <div class="user-avatar" style="background: var(--primary);">${user.avatar}</div>
+                            <span>${user.name}</span>
+                        </div>
+                        <div class="user-dropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; padding: 10px; min-width: 150px; z-index: 1000;">
+                            <a href="profile.html" style="display: block; padding: 8px 12px; color: #333; text-decoration: none;">Profile</a>
+                            <a href="orders.html" style="display: block; padding: 8px 12px; color: #333; text-decoration: none;">My Orders</a>
+                            <a href="#" onclick="logout()" style="display: block; padding: 8px 12px; color: #333; text-decoration: none;">Logout</a>
+                        </div>
+                    `;
+                    
+                    // Add click event for dropdown
+                    userProfile.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const dropdown = this.querySelector('.user-dropdown');
+                        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                    });
+                    
+                    // Close dropdown when clicking elsewhere
+                    document.addEventListener('click', function() {
+                        const dropdown = userProfile.querySelector('.user-dropdown');
+                        if (dropdown) {
+                            dropdown.style.display = 'none';
+                        }
+                    });
+                }
+            }
+        });
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                logoutUser().then(() => {
+                    window.location.href = 'index.html';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

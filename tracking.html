@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Order Tracking - AS Mart Sindhudurg</title>
+    <!-- Load all CSS first -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+
+        /* Main Container */
+        .tracking-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .tracking-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tracking-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .live-badge {
+            background: var(--danger);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Map */
+        #trackingMap {
+            height: 450px;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 2px solid #dee2e6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .map-btn {
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .map-btn:hover {
+            transform: scale(1.1);
+            background: var(--light);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #212529;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-light {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* Cards */
+        .info-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid #dee2e6;
+        }
+
+        .progress-step.active {
+            border-left-color: var(--primary);
+            background: #e8f4ff;
+        }
+
+        .progress-step.completed {
+            border-left-color: var(--success);
+            background: #f0fff4;
+        }
+
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .step-icon.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-icon.active {
+            background: var(--primary);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Delivery Boy Card */
+        .delivery-boy-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .delivery-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Live Updates */
+        .live-updates {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .update-item {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: var(--light);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .update-time {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        /* Order Items */
+        .order-items-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .item-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            transition: transform 0.3s;
+        }
+
+        .item-card:hover {
+            transform: translateX(5px);
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* ETA Display */
+        .eta-display {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .eta-time {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        /* Control Buttons */
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        /* Loading */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            font-size: 1.2rem;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        /* Location Selector */
+        .location-selector {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .location-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* SOS Button */
+        .sos-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 65, 108, 0.4);
+            z-index: 1000;
+            animation: sos-pulse 2s infinite;
+        }
+
+        @keyframes sos-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .tracking-container {
+                padding: 1rem;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #444;
+            color: #aaa;
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            padding: 1rem;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+            padding: 0.75rem;
+            border-radius: 10px;
+        }
+
+        .message.bot {
+            background: var(--light);
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Loading AS Mart Sindhudurg...</div>
+    </div>
+
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <div>AS <span>Mart</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="fas fa-store"></i> Shop</a></li>
+                <li><a href="#"><i class="fas fa-history"></i> History</a></li>
+                <li><a href="#" class="active"><i class="fas fa-map-marker-alt"></i> Track</a></li>
+                <li><a href="#"><i class="fas fa-star"></i> Reviews</a></li>
+            </ul>
+            
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="position: relative; cursor: pointer;">
+                    <i class="fas fa-shopping-cart fa-lg" style="color: var(--primary);"></i>
+                    <span style="position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">3</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; color: white;">U</div>
+                    <span>User</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="tracking-container">
+        <!-- Header -->
+        <div class="tracking-header">
+            <h2><i class="fas fa-shipping-fast"></i> Live Order Tracking</h2>
+            <p style="margin-bottom: 1rem;">Real-time tracking for Sindhudurg district deliveries</p>
+            <span class="live-badge">
+                <i class="fas fa-circle" style="font-size: 0.5rem;"></i> LIVE
+            </span>
+        </div>
+
+        <!-- Location Selector -->
+        <div class="location-selector">
+            <h3><i class="fas fa-map-marker-alt"></i> Select Your Location in Sindhudurg</h3>
+            <p>Choose delivery location for accurate tracking</p>
+            <div class="location-buttons">
+                <button class="btn btn-primary" onclick="setLocation('Sindhudurg City')">
+                    <i class="fas fa-city"></i> Sindhudurg City
+                </button>
+                <button class="btn" onclick="setLocation('Malvan')">
+                    <i class="fas fa-umbrella-beach"></i> Malvan
+                </button>
+                <button class="btn" onclick="setLocation('Kankavli')">
+                    <i class="fas fa-mountain"></i> Kankavli
+                </button>
+                <button class="btn" onclick="setLocation('Kudal')">
+                    <i class="fas fa-train"></i> Kudal
+                </button>
+                <button class="btn" onclick="setLocation('Sawantwadi')">
+                    <i class="fas fa-palette"></i> Sawantwadi
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Info -->
+        <div class="grid-4" style="margin: 2rem 0;">
+            <div class="info-card">
+                <div style="color: #666; margin-bottom: 0.5rem;"><i class="fas fa-receipt"></i> Order Number</div>
+                <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary);" id="orderNumber">#SDG-8245</div>
+            </div>
+            <div class="info-card">
+                <div style="color: #666; margin-bottom: 0.5rem;"><i class="fas fa-clock"></i> Order Time</div>
+                <div style="font-size: 1.1rem; font-weight: bold;" id="orderTime">11:30 AM, Today</div>
+            </div>
+            <div class="info-card">
+                <div style="color: #666; margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt"></i> Delivery To</div>
+                <div style="font-size: 1.1rem; font-weight: bold;" id="deliveryAddress">Sindhudurg City</div>
+            </div>
+            <div class="info-card">
+                <div style="color: #666; margin-bottom: 0.5rem;"><i class="fas fa-credit-card"></i> Payment</div>
+                <div style="font-size: 1.1rem; font-weight: bold;" id="paymentMethod">Cash on Delivery</div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div style="margin: 2rem 0;">
+            <h3><i class="fas fa-map"></i> Live Delivery Route</h3>
+            <div style="position: relative;">
+                <div id="trackingMap"></div>
+                <div class="map-controls">
+                    <button class="map-btn" onclick="centerMap()" title="Center Map">
+                        <i class="fas fa-crosshairs"></i>
+                    </button>
+                    <button class="map-btn" onclick="zoomIn()" title="Zoom In">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="map-btn" onclick="zoomOut()" title="Zoom Out">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ETA Display -->
+            <div class="eta-display">
+                <div style="font-size: 0.9rem;">Estimated Delivery Time</div>
+                <div class="eta-time" id="etaTime">35 min</div>
+                <div style="font-size: 0.9rem;">Via NH66 | Distance: <span id="distance">12 km</span></div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid-2" style="margin: 2rem 0;">
+            <!-- Left: Progress Steps -->
+            <div>
+                <h3><i class="fas fa-list-ol"></i> Delivery Status</h3>
+                <div class="progress-steps">
+                    <div class="progress-step completed">
+                        <div class="step-icon completed"><i class="fas fa-check"></i></div>
+                        <div>
+                            <div style="font-weight: bold;">Order Confirmed</div>
+                            <div style="font-size: 0.85rem; color: #666;">10:30 AM</div>
+                        </div>
+                    </div>
+                    <div class="progress-step completed">
+                        <div class="step-icon completed"><i class="fas fa-check"></i></div>
+                        <div>
+                            <div style="font-weight: bold;">Preparing Order</div>
+                            <div style="font-size: 0.85rem; color: #666;">11:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="progress-step active">
+                        <div class="step-icon active"><i class="fas fa-truck"></i></div>
+                        <div>
+                            <div style="font-weight: bold;">On the Way</div>
+                            <div style="font-size: 0.85rem; color: #666;">11:30 AM</div>
+                        </div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-icon"><i class="fas fa-home"></i></div>
+                        <div>
+                            <div style="font-weight: bold;">Nearby</div>
+                            <div style="font-size: 0.85rem; color: #666;">Expected 12:00 PM</div>
+                        </div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <div style="font-weight: bold;">Delivered</div>
+                            <div style="font-size: 0.85rem; color: #666;">Expected 12:15 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Stats Cards -->
+            <div>
+                <h3><i class="fas fa-chart-line"></i> Delivery Stats</h3>
+                <div class="grid-2" style="margin-top: 1rem;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="currentSpeed">45</div>
+                        <div>km/h Speed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="temperature">28°C</div>
+                        <div>Temperature</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="rating">4.8</div>
+                        <div>Partner Rating</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="items">6</div>
+                        <div>Total Items</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delivery Boy Info -->
+        <div class="delivery-boy-card">
+            <div class="delivery-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div style="flex: 1;">
+                <h3 style="margin-bottom: 0.5rem;">Your Delivery Partner</h3>
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <div style="font-size: 1.2rem; font-weight: bold;">Rajesh Patil</div>
+                        <div style="font-size: 0.9rem;">ID: SDG-4567</div>
+                    </div>
+                    <div>
+                        <div><i class="fas fa-phone"></i> +91 98765 43210</div>
+                        <div><i class="fas fa-motorcycle"></i> TVS Apache</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button class="btn btn-light" onclick="callDeliveryBoy()">
+                    <i class="fas fa-phone"></i> Call
+                </button>
+                <button class="btn btn-success" onclick="openChat()">
+                    <i class="fas fa-comment"></i> Chat
+                </button>
+            </div>
+        </div>
+
+        <!-- Order Items & Updates -->
+        <div class="grid-2" style="margin: 2rem 0; gap: 2rem;">
+            <!-- Order Items -->
+            <div class="order-items-card">
+                <h3 style="margin-bottom: 1rem;"><i class="fas fa-shopping-bag"></i> Order Items</h3>
+                <div id="orderItems">
+                    <!-- Items loaded by JS -->
+                </div>
+            </div>
+
+            <!-- Live Updates -->
+            <div class="live-updates">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 style="margin: 0;"><i class="fas fa-broadcast-tower"></i> Live Updates</h3>
+                    <button class="btn btn-sm" onclick="refreshUpdates()" style="padding: 0.5rem;">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div id="updatesList">
+                    <!-- Updates loaded by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="control-buttons">
+            <button class="btn btn-primary" onclick="shareTracking()">
+                <i class="fas fa-share-alt"></i> Share Tracking
+            </button>
+            <button class="btn btn-secondary" onclick="viewOrderDetails()">
+                <i class="fas fa-file-invoice"></i> Order Details
+            </button>
+            <button class="btn btn-success" onclick="markAsDelivered()">
+                <i class="fas fa-check-circle"></i> Mark Delivered
+            </button>
+            <button class="btn btn-warning" onclick="rescheduleDelivery()">
+                <i class="fas fa-calendar-alt"></i> Reschedule
+            </button>
+            <button class="btn btn-danger" onclick="reportIssue()">
+                <i class="fas fa-exclamation-triangle"></i> Report Issue
+            </button>
+        </div>
+    </main>
+
+    <!-- SOS Button -->
+    <button class="sos-button" onclick="showSOSModal()">
+        <i class="fas fa-exclamation-triangle"></i>
+    </button>
+
+    <!-- Chat Widget -->
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div>
+                <strong>Chat with Rajesh</strong>
+                <div style="font-size: 0.8rem;">Delivery Partner • Online</div>
+            </div>
+            <button onclick="closeChat()" style="background: none; border: none; color: white; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages appear here -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type your message..." 
+                   style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+            <button class="btn btn-primary" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-share-alt"></i> Share Tracking</h3>
+            <p>Share this link to track your order:</p>
+            <div style="display: flex; gap: 0.5rem; margin: 1rem 0;">
+                <input type="text" id="shareLink" value="https://asmart.com/track/SDG-8245" 
+                       style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;" readonly>
+                <button class="btn" onclick="copyLink()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn" style="background: #25D366; color: white;" onclick="shareWhatsApp()">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="btn" style="background: #1877F2; color: white;" onclick="shareFacebook()">
+                    <i class="fab fa-facebook"></i> Facebook
+                </button>
+            </div>
+            <button class="btn" onclick="closeModal('shareModal')" style="margin-top: 1rem; width: 100%;">Close</button>
+        </div>
+    </div>
+
+    <div id="sosModal" class="modal">
+        <div class="modal-content">
+            <div style="text-align: center; color: var(--danger); margin-bottom: 1rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem;"></i>
+                <h3>Emergency Assistance</h3>
+            </div>
+            <p>Select the type of emergency:</p>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin: 1rem 0;">
+                <button class="btn btn-danger" onclick="callEmergency('police')">
+                    <i class="fas fa-shield-alt"></i> Police (100)
+                </button>
+                <button class="btn btn-danger" onclick="callEmergency('medical')">
+                    <i class="fas fa-ambulance"></i> Medical (108)
+                </button>
+                <button class="btn btn-warning" onclick="callEmergency('delivery')">
+                    <i class="fas fa-truck"></i> Delivery Issue
+                </button>
+                <button class="btn btn-info" onclick="callEmergency('support')">
+                    <i class="fas fa-headset"></i> Customer Support
+                </button>
+            </div>
+            <button class="btn" onclick="closeModal('sosModal')" style="width: 100%;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>AS Mart Sindhudurg</h3>
+                <p>Fastest delivery service across Sindhudurg district</p>
+                <p style="margin-top: 0.5rem;"><i class="fas fa-map-marker-alt"></i> Sindhudurg City, Maharashtra</p>
+            </div>
+            <div class="footer-section">
+                <h3>Delivery Areas</h3>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="setLocation('Sindhudurg City')">Sindhudurg City</a></li>
+                    <li><a href="#" onclick="setLocation('Malvan')">Malvan</a></li>
+                    <li><a href="#" onclick="setLocation('Kankavli')">Kankavli</a></li>
+                    <li><a href="#" onclick="setLocation('Kudal')">Kudal</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-phone"></i> +91 1800-123-456</p>
+                <p><i class="fas fa-envelope"></i> support@asmart.com</p>
+                <p><i class="fas fa-clock"></i> 7AM - 10PM Daily</p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2024 AS Mart Sindhudurg. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    
+    <script>
+        // Global variables
+        let map;
+        let deliveryMarker;
+        let userMarker;
+        let routeControl;
+        let currentLocation = 'Sindhudurg City';
+        let watchId = null;
+        
+        // Sindhudurg locations
+        const sindhudurgLocations = {
+            'Sindhudurg City': { lat: 16.1450, lng: 73.6649, address: 'Main Market, Sindhudurg City, Maharashtra 416812' },
+            'Malvan': { lat: 16.0661, lng: 73.4666, address: 'Beach Road, Malvan, Maharashtra 416606' },
+            'Kankavli': { lat: 16.2833, lng: 73.6833, address: 'Kankavli Market, Maharashtra 416602' },
+            'Kudal': { lat: 16.0100, lng: 73.6900, address: 'Kudal Station Road, Maharashtra 416520' },
+            'Sawantwadi': { lat: 15.9000, lng: 73.8200, address: 'Sawantwadi Palace Road, Maharashtra 416510' }
+        };
+        
+        // Delivery boy starting location (from Malvan warehouse)
+        let deliveryBoyLocation = { lat: 16.0661, lng: 73.4666 };
+        
+        // User location (delivery destination)
+        let userLocation = sindhudurgLocations[currentLocation];
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+
+        function initializePage() {
+            // Hide loading screen
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                initializeMap();
+                loadOrderDetails();
+                startLiveTracking();
+            }, 1000);
+        }
+
+        function initializeMap() {
+            // Create map centered on Sindhudurg
+            map = L.map('trackingMap').setView([16.1450, 73.6649], 11);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+            
+            // Add Sindhudurg location markers
+            Object.entries(sindhudurgLocations).forEach(([name, loc]) => {
+                L.marker([loc.lat, loc.lng])
+                    .addTo(map)
+                    .bindPopup(`<b>${name}</b><br>${loc.address}`);
+            });
+            
+            // Add user marker (delivery destination)
+            userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                icon: L.divIcon({
+                    html: '<div style="background: #007bff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"><i class="fas fa-home"></i></div>',
+                    iconSize: [40, 40]
+                })
+            }).addTo(map).bindPopup('<b>Delivery Address</b><br>' + userLocation.address);
+            
+            // Add delivery boy marker
+            deliveryMarker = L.marker([deliveryBoyLocation.lat, deliveryBoyLocation.lng], {
+                icon: L.divIcon({
+                    html: '<div style="background: #28a745; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"><i class="fas fa-motorcycle"></i></div>',
+                    iconSize: [50, 50]
+                })
+            }).addTo(map).bindPopup('<b>Delivery Partner</b><br>Rajesh Patil');
+            
+            // Draw route
+            drawRoute();
+            
+            // Fit map to show both markers
+            const bounds = L.latLngBounds([deliveryBoyLocation, userLocation]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function drawRoute() {
+            if (routeControl) {
+                map.removeControl(routeControl);
+            }
+            
+            // Create route using Leaflet Routing Machine
+            routeControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(deliveryBoyLocation.lat, deliveryBoyLocation.lng),
+                    L.latLng(userLocation.lat, userLocation.lng)
+                ],
+                routeWhileDragging: false,
+                showAlternatives: false,
+                fitSelectedRoutes: false,
+                show: false,
+                createMarker: function() { return null; },
+                lineOptions: {
+                    styles: [{ color: '#007bff', weight: 5, opacity: 0.7 }]
+                }
+            }).addTo(map);
+            
+            // Update distance when route is calculated
+            routeControl.on('routesfound', function(e) {
+                const route = e.routes[0];
+                const distance = (route.summary.totalDistance / 1000).toFixed(1);
+                const time = Math.round(route.summary.totalTime / 60);
+                
+                document.getElementById('distance').textContent = distance + ' km';
+                document.getElementById('etaTime').textContent = time + ' min';
+            });
+        }
+
+        function loadOrderDetails() {
+            // Load Sindhudurg-specific items
+            const sindhudurgItems = [
+                { name: 'Malvani Masala', price: 250, quantity: 1, category: 'spices' },
+                { name: 'Fresh Fish', price: 180, quantity: 2, category: 'seafood' },
+                { name: 'Alphonso Mangoes', price: 450, quantity: 1, category: 'fruits' },
+                { name: 'Coconut Oil', price: 200, quantity: 1, category: 'groceries' },
+                { name: 'Kokam Syrup', price: 150, quantity: 1, category: 'beverages' },
+                { name: 'Cashew Nuts', price: 300, quantity: 1, category: 'snacks' }
+            ];
+            
+            // Display order items
+            const itemsContainer = document.getElementById('orderItems');
+            itemsContainer.innerHTML = sindhudurgItems.map(item => `
+                <div class="item-card">
+                    <div class="item-image">
+                        ${getCategoryIcon(item.category)}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold;">${item.name}</div>
+                        <div style="font-size: 0.85rem; color: #666;">Qty: ${item.quantity}</div>
+                    </div>
+                    <div style="font-weight: bold; color: var(--primary);">
+                        ₹${item.price * item.quantity}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Generate live updates
+            generateLiveUpdates();
+            
+            // Update total items count
+            document.getElementById('items').textContent = sindhudurgItems.length;
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'spices': '<i class="fas fa-mortar-pestle"></i>',
+                'seafood': '<i class="fas fa-fish"></i>',
+                'fruits': '<i class="fas fa-apple-alt"></i>',
+                'groceries': '<i class="fas fa-shopping-basket"></i>',
+                'beverages': '<i class="fas fa-wine-bottle"></i>',
+                'snacks': '<i class="fas fa-cookie"></i>'
+            };
+            return icons[category] || '<i class="fas fa-shopping-bag"></i>';
+        }
+
+        function generateLiveUpdates() {
+            const updates = [
+                { time: '10:30 AM', message: 'Order received at AS Mart Sindhudurg warehouse' },
+                { time: '10:45 AM', message: 'Order being packed with fresh local ingredients' },
+                { time: '11:00 AM', message: 'Delivery partner Rajesh assigned from Malvan depot' },
+                { time: '11:15 AM', message: 'Order picked up and on the way' },
+                { time: '11:30 AM', message: 'Currently on NH66 heading to Sindhudurg City' },
+                { time: 'Just now', message: 'Passing through Kudal area' }
+            ];
+            
+            const updatesContainer = document.getElementById('updatesList');
+            updatesContainer.innerHTML = updates.map(update => `
+                <div class="update-item">
+                    <div>${update.message}</div>
+                    <div class="update-time">
+                        <i class="far fa-clock"></i> ${update.time}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startLiveTracking() {
+            // Simulate delivery boy movement
+            watchId = setInterval(() => {
+                simulateDeliveryMovement();
+                updateLiveData();
+            }, 8000); // Update every 8 seconds
+        }
+
+        function simulateDeliveryMovement() {
+            // Move delivery boy closer to destination
+            const speed = 0.00002;
+            const dx = userLocation.lat - deliveryBoyLocation.lat;
+            const dy = userLocation.lng - deliveryBoyLocation.lng;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 0.0005) {
+                deliveryBoyLocation.lat += (dx / distance) * speed;
+                deliveryBoyLocation.lng += (dy / distance) * speed;
+                
+                // Update marker position
+                deliveryMarker.setLatLng([deliveryBoyLocation.lat, deliveryBoyLocation.lng]);
+                
+                // Update route
+                drawRoute();
+                
+                // Add occasional updates
+                if (Math.random() > 0.7) {
+                    addLiveUpdate(getRandomUpdate());
+                }
+            } else {
+                // Reached destination
+                addLiveUpdate('Reached delivery location!');
+                clearInterval(watchId);
+            }
+        }
+
+        function getRandomUpdate() {
+            const updates = [
+                'Making good progress on NH66',
+                'Passing through scenic Sindhudurg routes',
+                'Entering Sindhudurg City limits',
+                'Navigating through local streets',
+                'Almost at your location',
+                'Slowing down for traffic'
+            ];
+            return updates[Math.floor(Math.random() * updates.length)];
+        }
+
+        function addLiveUpdate(message) {
+            const updatesContainer = document.getElementById('updatesList');
+            const updateItem = document.createElement('div');
+            updateItem.className = 'update-item';
+            updateItem.innerHTML = `
+                <div>${message}</div>
+                <div class="update-time">
+                    <i class="far fa-clock"></i> Just now
+                </div>
+            `;
+            updatesContainer.insertBefore(updateItem, updatesContainer.firstChild);
+            
+            // Keep only last 6 updates
+            const updates = updatesContainer.querySelectorAll('.update-item');
+            if (updates.length > 6) {
+                updatesContainer.removeChild(updates[updates.length - 1]);
+            }
+        }
+
+        function updateLiveData() {
+            // Update speed (random between 40-50 km/h)
+            const speed = 40 + Math.floor(Math.random() * 10);
+            document.getElementById('currentSpeed').textContent = speed;
+            
+            // Update temperature (random between 28-32°C)
+            const temp = 28 + Math.floor(Math.random() * 4);
+            document.getElementById('temperature').textContent = temp + '°C';
+        }
+
+        // Map Controls
+        function centerMap() {
+            const bounds = L.latLngBounds([deliveryBoyLocation, userLocation]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function zoomIn() {
+            map.zoomIn();
+        }
+
+        function zoomOut() {
+            map.zoomOut();
+        }
+
+        // Location Functions
+        function setLocation(locationName) {
+            currentLocation = locationName;
+            userLocation = sindhudurgLocations[locationName];
+            
+            // Update UI
+            document.getElementById('deliveryAddress').textContent = locationName;
+            
+            // Update user marker
+            userMarker.setLatLng([userLocation.lat, userLocation.lng]);
+            userMarker.bindPopup('<b>Delivery Address</b><br>' + userLocation.address);
+            
+            // Update route
+            drawRoute();
+            
+            // Add update
+            addLiveUpdate(`Delivery location changed to ${locationName}`);
+            
+            // Show notification
+            showNotification(`Delivery location set to ${locationName}`, 'success');
+        }
+
+        // Action Functions
+        function callDeliveryBoy() {
+            alert('Calling delivery partner: +91 98765 43210');
+        }
+
+        function openChat() {
+            const chatWidget = document.getElementById('chatWidget');
+            chatWidget.style.display = 'flex';
+            
+            // Add welcome message if chat is empty
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages.children.length === 0) {
+                addChatMessage('bot', 'Hello! I\'m Rajesh, your delivery partner. I\'ll reach you in about 35 minutes.');
+            }
+        }
+
+        function closeChat() {
+            document.getElementById('chatWidget').style.display = 'none';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                addChatMessage('user', message);
+                
+                // Clear input
+                input.value = '';
+                
+                // Auto-reply after 1 second
+                setTimeout(() => {
+                    const replies = [
+                        'I should reach in about 25-30 minutes.',
+                        'Yes, I have exact change.',
+                        'Please keep the gate open for delivery.',
+                        'I\'m near the Sindhudurg Fort area.',
+                        'Traffic is light, making good time.'
+                    ];
+                    const reply = replies[Math.floor(Math.random() * replies.length)];
+                    addChatMessage('bot', reply);
+                }, 1000);
+            }
+        }
+
+        function addChatMessage(sender, text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function shareTracking() {
+            document.getElementById('shareModal').style.display = 'flex';
+        }
+
+        function copyLink() {
+            const input = document.getElementById('shareLink');
+            input.select();
+            document.execCommand('copy');
+            showNotification('Tracking link copied to clipboard!', 'success');
+        }
+
+        function shareWhatsApp() {
+            const text = `Track my AS Mart Sindhudurg order #SDG-8245: ${window.location.href}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function shareFacebook() {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+
+        function showSOSModal() {
+            document.getElementById('sosModal').style.display = 'flex';
+        }
+
+        function callEmergency(type) {
+            const numbers = {
+                'police': '100',
+                'medical': '108',
+                'delivery': '+91 1800-123-456',
+                'support': '+91 1800-654-321'
+            };
+            
+            alert(`Calling ${type} emergency: ${numbers[type]}`);
+            closeModal('sosModal');
+            addLiveUpdate(`Emergency contact initiated: ${type}`);
+        }
+
+        function viewOrderDetails() {
+            showNotification('Opening order details...', 'info');
+            // In real app, this would open order details page
+        }
+
+        function markAsDelivered() {
+            if (confirm('Mark this order as delivered?')) {
+                showNotification('Order marked as delivered!', 'success');
+                addLiveUpdate('Order delivered successfully!');
+                
+                // Update status
+                document.querySelectorAll('.progress-step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                document.querySelectorAll('.progress-step')[4].classList.add('completed');
+            }
+        }
+
+        function rescheduleDelivery() {
+            const newTime = prompt('Enter new delivery time (e.g., 2:00 PM):');
+            if (newTime) {
+                addLiveUpdate(`Delivery rescheduled to ${newTime}`);
+                showNotification(`Delivery rescheduled to ${newTime}`, 'info');
+            }
+        }
+
+        function reportIssue() {
+            const issue = prompt('Please describe the issue:');
+            if (issue) {
+                addLiveUpdate(`Issue reported: ${issue}`);
+                showNotification('Issue reported. Support will contact you.', 'info');
+            }
+        }
+
+        function refreshUpdates() {
+            generateLiveUpdates();
+            showNotification('Live updates refreshed!', 'success');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                z-index: 3000;
+                animation: slideIn 0.3s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+            
+            // Add slideOut animation if not exists
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            if (watchId) {
+                clearInterval(watchId);
+            }
+        });
+    </script>
+</body>
+</html>

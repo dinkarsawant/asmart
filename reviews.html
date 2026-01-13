@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews - AS Mart</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles for reviews page */
+        .reviews-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .reviews-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .rating-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .average-rating {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .rating-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .rating-stars {
+            color: var(--warning);
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .rating-count {
+            color: #666;
+        }
+        
+        .rating-bars {
+            margin-top: 1.5rem;
+        }
+        
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rating-label {
+            width: 80px;
+            font-size: 0.9rem;
+        }
+        
+        .rating-bar-line {
+            flex: 1;
+            height: 8px;
+            background: #EEE;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 1rem;
+        }
+        
+        .rating-bar-fill {
+            height: 100%;
+            background: var(--warning);
+        }
+        
+        .write-review {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .star-rating-input {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .star-rating-input i {
+            font-size: 2rem;
+            color: #DDD;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .star-rating-input i:hover,
+        .star-rating-input i.active {
+            color: var(--warning);
+        }
+        
+        .review-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .review-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .review-meta {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .review-user-name {
+            font-weight: bold;
+        }
+        
+        .review-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .review-body {
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+        
+        .review-images {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .review-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .review-helpful {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .helpful-btn {
+            background: #F8F9FA;
+            border: 1px solid #DDD;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+        }
+        
+        .helpful-btn:hover {
+            background: #EEE;
+        }
+        
+        .helpful-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .filter-reviews {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #DDD;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .review-sort {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .sort-select {
+            padding: 0.5rem;
+            border: 1px solid #DDD;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .image-upload {
+            margin: 1rem 0;
+        }
+        
+        .upload-btn {
+            background: #F8F9FA;
+            border: 2px dashed #DDD;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-btn:hover {
+            background: #EEE;
+        }
+        
+        .preview-images {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .preview-image {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AS <span>Mart</span></h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+                <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Track</a></li>
+                <li><a href="reviews.html" class="active"><i class="fas fa-star"></i> Reviews</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <div class="cart-icon" onclick="location.href='cart.html'">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">U</div>
+                    <span>Guest</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title" style="margin: 2rem 0;"><i class="fas fa-star"></i> Customer Reviews</h2>
+        
+        <div class="reviews-container">
+            <div class="rating-summary">
+                <div class="average-rating">
+                    <div class="rating-number">4.8</div>
+                    <div class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="rating-count">Based on 1,247 reviews</div>
+                </div>
+                
+                <div class="rating-bars">
+                    <div class="rating-bar">
+                        <div class="rating-label">5 stars</div>
+                        <div class="rating-bar-line">
+                            <div class="rating-bar-fill" style="width: 85%"></div>
+                        </div>
+                        <div class="rating-count">85%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">4 stars</div>
+                        <div class="rating-bar-line">
+                            <div class="rating-bar-fill" style="width: 12%"></div>
+                        </div>
+                        <div class="rating-count">12%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">3 stars</div>
+                        <div class="rating-bar-line">
+                            <div class="rating-bar-fill" style="width: 2%"></div>
+                        </div>
+                        <div class="rating-count">2%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">2 stars</div>
+                        <div class="rating-bar-line">
+                            <div class="rating-bar-fill" style="width: 1%"></div>
+                        </div>
+                        <div class="rating-count">1%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">1 star</div>
+                        <div class="rating-bar-line">
+                            <div class="rating-bar-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="rating-count">0%</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem; text-align: center;">
+                    <h4><i class="fas fa-trophy"></i> Top Rated Items</h4>
+                    <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #EEE;">
+                            <i class="fas fa-utensils" style="color: var(--primary);"></i> Chicken Biryani (4.9/5)
+                        </li>
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid #EEE;">
+                            <i class="fas fa-bread-slice" style="color: var(--primary);"></i> Fresh Bread (4.7/5)
+                        </li>
+                        <li style="padding: 0.5rem 0;">
+                            <i class="fas fa-motorcycle" style="color: var(--primary);"></i> Delivery Service (4.8/5)
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="write-review">
+                <h3>Write a Review</h3>
+                <p>Share your experience with AS Mart</p>
+                
+                <div id="reviewForm">
+                    <div class="form-group">
+                        <label>Your Rating</label>
+                        <div class="star-rating-input" id="starRating">
+                            <i class="fas fa-star" data-value="1"></i>
+                            <i class="fas fa-star" data-value="2"></i>
+                            <i class="fas fa-star" data-value="3"></i>
+                            <i class="fas fa-star" data-value="4"></i>
+                            <i class="fas fa-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" id="ratingValue" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Review Title</label>
+                        <input type="text" class="form-control" id="reviewTitle" placeholder="Summarize your experience">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Your Review</label>
+                        <textarea class="form-control" id="reviewText" rows="4" 
+                                  placeholder="Tell us about your experience..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Order Number (Optional)</label>
+                        <input type="text" class="form-control" id="orderNumber" 
+                               placeholder="If reviewing a specific order">
+                    </div>
+                    
+                    <div class="image-upload">
+                        <label>Add Photos (Optional)</label>
+                        <div class="upload-btn" onclick="document.getElementById('imageUpload').click()">
+                            <i class="fas fa-camera fa-2x" style="color: #DDD; margin-bottom: 0.5rem;"></i>
+                            <p>Click to upload images</p>
+                            <small>Max 3 images, 5MB each</small>
+                        </div>
+                        <input type="file" id="imageUpload" accept="image/*" multiple 
+                               style="display: none" onchange="handleImageUpload(event)">
+                        
+                        <div class="preview-images" id="imagePreview">
+                            <!-- Preview images will appear here -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block" onclick="submitReview()">
+                        <i class="fas fa-paper-plane"></i> Submit Review
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="review-sort">
+            <span>Sort by:</span>
+            <select class="sort-select" id="sortReviews" onchange="sortReviews()">
+                <option value="newest">Newest First</option>
+                <option value="highest">Highest Rated</option>
+                <option value="lowest">Lowest Rated</option>
+                <option value="helpful">Most Helpful</option>
+            </select>
+        </div>
+        
+        <div class="filter-reviews">
+            <div class="filter-btn active" onclick="filterReviews('all')">All Reviews</div>
+            <div class="filter-btn" onclick="filterReviews('5')">5 Stars</div>
+            <div class="filter-btn" onclick="filterReviews('4')">4 Stars</div>
+            <div class="filter-btn" onclick="filterReviews('3')">3 Stars</div>
+            <div class="filter-btn" onclick="filterReviews('2')">2 Stars</div>
+            <div class="filter-btn" onclick="filterReviews('1')">1 Star</div>
+            <div class="filter-btn" onclick="filterReviews('with-images')">With Photos</div>
+        </div>
+        
+        <div id="reviewsList">
+            <!-- Reviews will be loaded here -->
+        </div>
+        
+        <div style="text-align: center; margin: 3rem 0;">
+            <button class="btn btn-secondary" id="loadMoreBtn" onclick="loadMoreReviews()">
+                <i class="fas fa-sync"></i> Load More Reviews
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>AS Mart</h3>
+                    <p>Your trusted 20-minute delivery partner for all daily needs.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html">Shop Now</a></li>
+                        <li><a href="orders.html">My Orders</a></li>
+                        <li><a href="tracking.html">Track Order</a></li>
+                        <li><a href="reviews.html">Leave Review</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-envelope"></i> support@asmart.com</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 AS Mart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Image Preview Modal -->
+    <div id="imagePreviewModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal" onclick="closeModal('imagePreviewModal')">&times;</span>
+            <img id="previewedImage" src="" style="width: 100%; border-radius: 10px;">
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Reviews functionality
+        let selectedRating = 0;
+        let uploadedImages = [];
+        let reviewsLoaded = 0;
+        const reviewsPerLoad = 5;
+        let currentSort = 'newest';
+        let currentFilter = 'all';
+        
+        // Sample reviews data
+        const sampleReviews = [
+            {
+                id: 1,
+                userName: "Sarah Johnson",
+                userInitial: "S",
+                rating: 5,
+                title: "Amazing 20-minute delivery!",
+                review: "I ordered groceries and they arrived in exactly 18 minutes! Fresh products and friendly delivery partner.",
+                date: "2024-01-15",
+                orderId: "ASM123456",
+                helpful: 24,
+                images: []
+            },
+            {
+                id: 2,
+                userName: "Mike Chen",
+                userInitial: "M",
+                rating: 4,
+                title: "Great service, fresh food",
+                review: "The pizza was hot and delicious. Delivery was a bit longer than 20 minutes but still very fast.",
+                date: "2024-01-14",
+                orderId: "ASM123457",
+                helpful: 18,
+                images: ["https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400"]
+            },
+            {
+                id: 3,
+                userName: "Priya Patel",
+                userInitial: "P",
+                rating: 5,
+                title: "Lifesaver during busy days",
+                review: "AS Mart has become my go-to for last-minute items. Super reliable and always within 20 minutes!",
+                date: "2024-01-13",
+                orderId: "ASM123458",
+                helpful: 32,
+                images: []
+            },
+            {
+                id: 4,
+                userName: "David Kim",
+                userInitial: "D",
+                rating: 5,
+                title: "Best delivery app ever",
+                review: "From electronics to food, everything arrives super fast. The tracking feature is amazing!",
+                date: "2024-01-12",
+                orderId: "ASM123459",
+                helpful: 45,
+                images: ["https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400"]
+            },
+            {
+                id: 5,
+                userName: "Emma Wilson",
+                userInitial: "E",
+                rating: 4,
+                title: "Very convenient",
+                review: "Love the variety of products. Wish there were more organic options though.",
+                date: "2024-01-11",
+                orderId: "ASM123460",
+                helpful: 12,
+                images: []
+            }
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeStarRating();
+            loadReviews();
+            updateCartCount();
+            
+            // Check if user is logged in
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                document.getElementById('reviewForm').innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <h4>Please login to write a review</h4>
+                        <button class="btn btn-primary" onclick="location.href='login.html'">
+                            <i class="fas fa-sign-in-alt"></i> Login to Review
+                        </button>
+                    </div>
+                `;
+            }
+        });
+        
+        function initializeStarRating() {
+            const stars = document.querySelectorAll('#starRating i');
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const value = parseInt(this.getAttribute('data-value'));
+                    highlightStars(value);
+                });
+                
+                star.addEventListener('click', function() {
+                    selectedRating = parseInt(this.getAttribute('data-value'));
+                    document.getElementById('ratingValue').value = selectedRating;
+                    highlightStars(selectedRating);
+                });
+            });
+            
+            document.getElementById('starRating').addEventListener('mouseleave', function() {
+                highlightStars(selectedRating);
+            });
+        }
+        
+        function highlightStars(count) {
+            const stars = document.querySelectorAll('#starRating i');
+            stars.forEach((star, index) => {
+                if (index < count) {
+                    star.classList.add('active');
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('active');
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
+        
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('imagePreview');
+            
+            for (let i = 0; i < Math.min(files.length, 3); i++) {
+                const file = files[i];
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File too large. Max 5MB per image.');
+                    continue;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImages.push({
+                        name: file.name,
+                        data: e.target.result
+                    });
+                    
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'preview-image';
+                    imgDiv.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <div class="remove-image" onclick="removeImage(${uploadedImages.length - 1})">&times;</div>
+                    `;
+                    preview.appendChild(imgDiv);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            loadImagePreview();
+        }
+        
+        function loadImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            uploadedImages.forEach((image, index) => {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = 'preview-image';
+                imgDiv.innerHTML = `
+                    <img src="${image.data}" alt="Preview">
+                    <div class="remove-image" onclick="removeImage(${index})">&times;</div>
+                `;
+                preview.appendChild(imgDiv);
+            });
+        }
+        
+        function submitReview() {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert('Please login to submit a review');
+                return;
+            }
+            
+            if (selectedRating === 0) {
+                alert('Please select a rating');
+                return;
+            }
+            
+            const title = document.getElementById('reviewTitle').value.trim();
+            const reviewText = document.getElementById('reviewText').value.trim();
+            const orderNumber = document.getElementById('orderNumber').value.trim();
+            
+            if (!title || !reviewText) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const reviewData = {
+                userId: user.uid,
+                userName: user.displayName || user.email.split('@')[0],
+                userEmail: user.email,
+                rating: selectedRating,
+                title: title,
+                review: reviewText,
+                orderId: orderNumber || null,
+                images: uploadedImages,
+                helpful: 0,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                reported: false
+            };
+            
+            // Save to Firebase
+            db.collection('reviews').add(reviewData)
+                .then(() => {
+                    alert('Thank you for your review!');
+                    
+                    // Reset form
+                    selectedRating = 0;
+                    document.getElementById('ratingValue').value = 0;
+                    document.getElementById('reviewTitle').value = '';
+                    document.getElementById('reviewText').value = '';
+                    document.getElementById('orderNumber').value = '';
+                    uploadedImages = [];
+                    loadImagePreview();
+                    highlightStars(0);
+                    
+                    // Reload reviews
+                    loadReviews();
+                })
+                .catch(error => {
+                    console.error('Error submitting review:', error);
+                    alert('Error submitting review. Please try again.');
+                });
+        }
+        
+        function loadReviews() {
+            const container = document.getElementById('reviewsList');
+            
+            // Filter reviews
+            let filteredReviews = [...sampleReviews];
+            
+            if (currentFilter !== 'all') {
+                if (currentFilter === 'with-images') {
+                    filteredReviews = filteredReviews.filter(r => r.images.length > 0);
+                } else {
+                    filteredReviews = filteredReviews.filter(r => r.rating === parseInt(currentFilter));
+                }
+            }
+            
+            // Sort reviews
+            filteredReviews.sort((a, b) => {
+                switch(currentSort) {
+                    case 'newest':
+                        return new Date(b.date) - new Date(a.date);
+                    case 'highest':
+                        return b.rating - a.rating;
+                    case 'lowest':
+                        return a.rating - b.rating;
+                    case 'helpful':
+                        return b.helpful - a.helpful;
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Display reviews
+            container.innerHTML = '';
+            reviewsLoaded = Math.min(reviewsPerLoad, filteredReviews.length);
+            
+            for (let i = 0; i < reviewsLoaded; i++) {
+                const review = filteredReviews[i];
+                container.innerHTML += createReviewCard(review);
+            }
+            
+            // Show/hide load more button
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (reviewsLoaded >= filteredReviews.length) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'inline-flex';
+            }
+        }
+        
+        function createReviewCard(review) {
+            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+            
+            const imagesHTML = review.images.length > 0 ? `
+                <div class="review-images">
+                    ${review.images.map(img => `
+                        <img src="${img}" class="review-image" onclick="previewImage('${img}')">
+                    `).join('')}
+                </div>
+            ` : '';
+            
+            return `
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-user">
+                            <div class="user-avatar-small">${review.userInitial}</div>
+                            <div class="review-meta">
+                                <div class="review-user-name">${review.userName}</div>
+                                <div class="review-date">${review.date}</div>
+                            </div>
+                        </div>
+                        <div style="color: var(--warning); font-weight: bold;">
+                            ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                        </div>
+                    </div>
+                    
+                    <h4>${review.title}</h4>
+                    <div class="review-body">
+                        ${review.review}
+                    </div>
+                    
+                    ${review.orderId ? `
+                        <div style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                            <i class="fas fa-receipt"></i> Order #${review.orderId}
+                        </div>
+                    ` : ''}
+                    
+                    ${imagesHTML}
+                    
+                    <div class="review-helpful">
+                        <button class="helpful-btn" onclick="markHelpful(${review.id})">
+                            <i class="fas fa-thumbs-up"></i> Helpful
+                        </button>
+                        <span class="helpful-count">${review.helpful} people found this helpful</span>
+                        <button class="helpful-btn" onclick="reportReview(${review.id})" style="margin-left: auto;">
+                            <i class="fas fa-flag"></i> Report
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function loadMoreReviews() {
+            reviewsLoaded += reviewsPerLoad;
+            loadReviews();
+        }
+        
+        function sortReviews() {
+            currentSort = document.getElementById('sortReviews').value;
+            loadReviews();
+        }
+        
+        function filterReviews(filter) {
+            currentFilter = filter;
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            loadReviews();
+        }
+        
+        function markHelpful(reviewId) {
+            // In a real app, update in Firebase
+            alert('Thanks for your feedback!');
+        }
+        
+        function reportReview(reviewId) {
+            const reason = prompt('Please specify the reason for reporting this review:');
+            if (reason) {
+                // In a real app, save report to Firebase
+                alert('Thank you for reporting. Our team will review this content.');
+            }
+        }
+        
+        function previewImage(imageUrl) {
+            document.getElementById('previewedImage').src = imageUrl;
+            document.getElementById('imagePreviewModal').style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.querySelector('.cart-count').textContent = cart.reduce((total, item) => total + item.quantity, 0);
+        }
+    </script>
+</body>
+</html>

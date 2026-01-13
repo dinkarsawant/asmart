@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - AS Mart</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles for orders page */
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .order-id {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .order-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .order-status {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-confirmed { background: #D1ECF1; color: #0C5460; }
+        .status-preparing { background: #D4EDDA; color: #155724; }
+        .status-ontheway { background: #CCE5FF; color: #004085; }
+        .status-delivered { background: #E8F5E9; color: #1B5E20; }
+        .status-cancelled { background: #F8D7DA; color: #721C24; }
+        
+        .order-items {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #F8F9FA;
+            border-radius: 10px;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #EEE;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .order-total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 1rem;
+        }
+        
+        .reorder-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .empty-orders i {
+            font-size: 4rem;
+            color: #DDD;
+            margin-bottom: 1rem;
+        }
+        
+        .order-timeline {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #F8F9FA;
+            border-radius: 10px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #DDD;
+        }
+        
+        .timeline-dot.active {
+            background: var(--primary);
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AS <span>Mart</span></h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+                <li><a href="orders.html" class="active"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Track</a></li>
+                <li><a href="reviews.html"><i class="fas fa-star"></i> Reviews</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <div class="cart-icon" onclick="location.href='cart.html'">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">U</div>
+                    <span>Guest</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="orders-header">
+            <h2 class="section-title"><i class="fas fa-clipboard-list"></i> My Orders</h2>
+            
+            <div class="filter-tabs">
+                <div class="filter-tab active" onclick="filterOrders('all')">All Orders</div>
+                <div class="filter-tab" onclick="filterOrders('pending')">Pending</div>
+                <div class="filter-tab" onclick="filterOrders('preparing')">Preparing</div>
+                <div class="filter-tab" onclick="filterOrders('delivered')">Delivered</div>
+                <div class="filter-tab" onclick="filterOrders('cancelled')">Cancelled</div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="location.href='shop.html'">
+                <i class="fas fa-plus"></i> New Order
+            </button>
+        </div>
+        
+        <div id="ordersContainer">
+            <!-- Orders will be loaded here -->
+        </div>
+        
+        <!-- Order Details Modal -->
+        <div id="orderDetailsModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal('orderDetailsModal')">&times;</span>
+                <h2>Order Details</h2>
+                <div id="orderDetailsContent">
+                    <!-- Order details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>AS Mart</h3>
+                    <p>Your trusted 20-minute delivery partner for all daily needs.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html">Shop Now</a></li>
+                        <li><a href="orders.html">My Orders</a></li>
+                        <li><a href="tracking.html">Track Order</a></li>
+                        <li><a href="reviews.html">Leave Review</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-envelope"></i> support@asmart.com</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 AS Mart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/orders.js"></script>
+    <script>
+        // Additional orders functionality
+        let currentFilter = 'all';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserOrders();
+            updateCartCount();
+            
+            // Check authentication
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (!user) {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+        
+        function filterOrders(filter) {
+            currentFilter = filter;
+            
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.toLowerCase().includes(filter)) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Reload orders with filter
+            loadUserOrders();
+        }
+        
+        function viewOrderDetails(orderId) {
+            // Fetch order details from Firebase
+            db.collection('orders').doc(orderId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const order = doc.data();
+                        displayOrderDetails(order);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching order details:', error);
+                });
+        }
+        
+        function displayOrderDetails(order) {
+            const modalContent = document.getElementById('orderDetailsContent');
+            const itemsList = order.items.map(item => 
+                `<div class="order-item">
+                    <span>${item.name} x${item.quantity}</span>
+                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                </div>`
+            ).join('');
+            
+            modalContent.innerHTML = `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #${order.orderId}</div>
+                            <div class="order-date">${order.timestamp?.toDate().toLocaleString()}</div>
+                        </div>
+                        <div class="order-status status-${order.status}">${order.status}</div>
+                    </div>
+                    
+                    <h4><i class="fas fa-map-marker-alt"></i> Delivery Address</h4>
+                    <p>${order.address}, ${order.city} ${order.zipCode}</p>
+                    
+                    <h4 style="margin-top: 1rem;"><i class="fas fa-box"></i> Items</h4>
+                    <div class="order-items">
+                        ${itemsList}
+                    </div>
+                    
+                    <div class="order-total">
+                        Total: $${order.total?.toFixed(2) || '0.00'}
+                    </div>
+                    
+                    <h4 style="margin-top: 1.5rem;"><i class="fas fa-history"></i> Order Timeline</h4>
+                    <div class="order-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-dot ${order.status !== 'pending' ? 'active' : ''}"></div>
+                            <div class="timeline-content">
+                                <strong>Order Placed</strong>
+                                <div class="timeline-time">${order.timestamp?.toDate().toLocaleTimeString()}</div>
+                            </div>
+                        </div>
+                        ${order.status !== 'pending' ? `
+                        <div class="timeline-item">
+                            <div class="timeline-dot ${order.status !== 'confirmed' ? 'active' : ''}"></div>
+                            <div class="timeline-content">
+                                <strong>Order Confirmed</strong>
+                                <div class="timeline-time">${new Date(order.timestamp?.toDate().getTime() + 300000).toLocaleTimeString()}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${order.status === 'delivered' ? `
+                        <div class="timeline-item">
+                            <div class="timeline-dot active"></div>
+                            <div class="timeline-content">
+                                <strong>Delivered</strong>
+                                <div class="timeline-time">${new Date(order.timestamp?.toDate().getTime() + 1200000).toLocaleTimeString()}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="order-actions">
+                        <button class="btn btn-primary" onclick="trackOrder('${order.orderId}')">
+                            <i class="fas fa-map-marker-alt"></i> Track Order
+                        </button>
+                        ${order.status === 'delivered' ? 
+                            `<button class="btn btn-secondary" onclick="rateOrder('${order.orderId}')">
+                                <i class="fas fa-star"></i> Rate Order
+                            </button>` : ''}
+                        ${order.status === 'pending' ? 
+                            `<button class="btn btn-danger" onclick="cancelOrder('${order.orderId}')">
+                                <i class="fas fa-times"></i> Cancel Order
+                            </button>` : ''}
+                        <button class="reorder-btn" onclick="reorderItems('${order.orderId}')">
+                            <i class="fas fa-redo"></i> Reorder
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            openModal('orderDetailsModal');
+        }
+        
+        function trackOrder(orderId) {
+            window.location.href = `tracking.html?order=${orderId}`;
+        }
+        
+        function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                db.collection('orders').doc(orderId).update({
+                    status: 'cancelled'
+                })
+                .then(() => {
+                    alert('Order cancelled successfully');
+                    closeModal('orderDetailsModal');
+                    loadUserOrders();
+                })
+                .catch(error => {
+                    console.error('Error cancelling order:', error);
+                    alert('Error cancelling order');
+                });
+            }
+        }
+        
+        function reorderItems(orderId) {
+            db.collection('orders').doc(orderId).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const order = doc.data();
+                        // Add items to cart
+                        order.items.forEach(item => {
+                            addToCart(item.id);
+                        });
+                        alert('Items added to cart!');
+                        closeModal('orderDetailsModal');
+                    }
+                });
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.querySelector('.cart-count').textContent = cart.reduce((total, item) => total + item.quantity, 0);
+        }
+    </script>
+</body>
+</html>
