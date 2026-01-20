@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - AS Mart</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AS <span>Mart</span></h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+                <li><a href="orders.html"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Track</a></li>
+                <li><a href="reviews.html"><i class="fas fa-star"></i> Reviews</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <div class="cart-icon" onclick="location.href='cart.html'">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                <div class="user-profile" id="userProfile">
+                    <div class="user-avatar">U</div>
+                    <span>Guest</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title" style="margin: 2rem 0;"><i class="fas fa-shopping-cart"></i> Your Cart</h2>
+        
+        <div id="cartItems">
+            <!-- Cart items will be loaded here -->
+        </div>
+        
+        <div class="cart-summary">
+            <div class="summary-item">
+                <span>Subtotal</span>
+                <span id="subtotal">$0.00</span>
+            </div>
+            <div class="summary-item">
+                <span>Delivery Fee</span>
+                <span id="deliveryFee">$2.99</span>
+            </div>
+            <div class="summary-item">
+                <span>Tax (10%)</span>
+                <span id="tax">$0.00</span>
+            </div>
+            <div class="summary-item total">
+                <span>Total</span>
+                <span id="total">$0.00</span>
+            </div>
+            
+            <button class="btn btn-primary btn-block" style="margin-top: 2rem;" onclick="proceedToCheckout()">
+                <i class="fas fa-lock"></i> Proceed to Checkout
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>AS Mart</h3>
+                    <p>Your trusted 20-minute delivery partner for all daily needs.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="shop.html">Shop Now</a></li>
+                        <li><a href="orders.html">My Orders</a></li>
+                        <li><a href="tracking.html">Track Order</a></li>
+                        <li><a href="reviews.html">Leave Review</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +1 234 567 890</p>
+                    <p><i class="fas fa-envelope"></i> support@asmart.com</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 AS Mart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/cart.js"></script>
+    <script>
+	document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication for customer pages
+    if (!isAuthenticated()) {
+        // Optional: Allow shopping as guest, but require login at checkout
+        // For now, redirect to login
+        window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+    }
+    
+    const user = getCurrentUser();
+    // Customers can access, hosts can also view but might have different experience
+    // You can customize based on user role
+    
+    // Update user profile in header
+    const userProfile = document.getElementById('userProfile');
+    if (userProfile && user) {
+        userProfile.innerHTML = `
+            <div class="user-avatar" style="background: var(--primary);">${user.avatar}</div>
+            <span>${user.name}</span>
+        `;
+    }
+});
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+            updateCartCount();
+        });
+        
+        function proceedToCheckout() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            
+            // Check if user is logged in
+            if (!firebase.auth().currentUser) {
+                alert('Please login to proceed to checkout');
+                return;
+            }
+            
+            window.location.href = 'checkout.html';
+        }
+        
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.querySelector('.cart-count').textContent = cart.reduce((total, item) => total + item.quantity, 0);
+        }
+    </script>
+</body>
+</html>

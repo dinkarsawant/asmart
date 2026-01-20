@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AS Mart Orders</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <div class="nav-brand">
+            <div class="store-logo">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <div>
+                <h1 id="storeNameHeader">AS Mart Admin</h1>
+                <p class="store-tagline">Orders Management Dashboard</p>
+            </div>
+        </div>
+        <div class="nav-info">
+            <div class="nav-stat">
+                <i class="fas fa-clock"></i>
+                <span id="currentTime">Loading...</span>
+            </div>
+            <div class="nav-stat">
+                <i class="fas fa-calendar"></i>
+                <span id="currentDate">--/--/----</span>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <button id="refreshBtn" class="nav-btn" title="Refresh Orders">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button id="notificationsBtn" class="nav-btn" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <span class="badge" id="notificationCount">0</span>
+            </button>
+            <button id="logoutBtn" class="nav-btn logout" title="Logout">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card total-orders">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Orders</h3>
+                    <p class="stat-number" id="totalOrders">0</p>
+                    <p class="stat-change"><i class="fas fa-arrow-up"></i> <span id="ordersToday">0</span> today</p>
+                </div>
+            </div>
+            
+            <div class="stat-card pending-orders">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Pending</h3>
+                    <p class="stat-number" id="pendingOrders">0</p>
+                    <p class="stat-change">Awaiting action</p>
+                </div>
+            </div>
+            
+            <div class="stat-card revenue">
+                <div class="stat-icon">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Revenue</h3>
+                    <p class="stat-number">₹<span id="totalRevenue">0</span></p>
+                    <p class="stat-change">This month</p>
+                </div>
+            </div>
+            
+            <div class="stat-card customers">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Customers</h3>
+                    <p class="stat-number" id="totalCustomers">0</p>
+                    <p class="stat-change">Unique customers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Left Column: Orders List -->
+            <div class="orders-column">
+                <div class="section-header">
+                    <h2><i class="fas fa-list-ol"></i> Recent Orders</h2>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchOrders" placeholder="Search orders...">
+                        </div>
+                        <div class="filters">
+                            <select id="statusFilter">
+                                <option value="all">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Out for Delivery">Out for Delivery</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <select id="timeFilter">
+                                <option value="all">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="orders-list" id="ordersList">
+                    <!-- Orders will be loaded here -->
+                    <div class="no-orders" id="noOrdersMessage">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Orders Yet</h3>
+                        <p>When customers place orders, they will appear here</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Details -->
+            <div class="details-column">
+                <div class="section-header">
+                    <h2><i class="fas fa-info-circle"></i> Order Details</h2>
+                    <div class="order-actions" id="orderActions" style="display: none;">
+                        <button class="action-btn accept" id="acceptOrderBtn">
+                            <i class="fas fa-check"></i> Accept Order
+                        </button>
+                        <button class="action-btn reject" id="rejectOrderBtn">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="action-btn process" id="processOrderBtn">
+                            <i class="fas fa-cog"></i> Process
+                        </button>
+                    </div>
+                </div>
+
+                <div class="order-details-container" id="orderDetailsContainer">
+                    <div class="select-order-message">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <h3>Select an Order</h3>
+                        <p>Click on any order from the list to view details</p>
+                    </div>
+
+                    <div class="order-details-content" id="orderDetailsContent" style="display: none;">
+                        <!-- Order details will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Quick Actions Panel -->
+                <div class="quick-actions-panel">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    <div class="quick-actions">
+                        <button class="quick-btn" id="markDeliveredBtn">
+                            <i class="fas fa-check-circle"></i> Mark Delivered
+                        </button>
+                        <button class="quick-btn" id="callCustomerBtn">
+                            <i class="fas fa-phone"></i> Call Customer
+                        </button>
+                        <button class="quick-btn" id="printInvoiceBtn">
+                            <i class="fas fa-print"></i> Print Invoice
+                        </button>
+                        <button class="quick-btn" id="viewOnMapBtn">
+                            <i class="fas fa-map-marker-alt"></i> View on Map
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Panel: Bulk Actions -->
+        <div class="bulk-actions-panel">
+            <h3><i class="fas fa-tasks"></i> Bulk Operations</h3>
+            <div class="bulk-actions">
+                <button class="bulk-btn" id="acceptAllPendingBtn">
+                    <i class="fas fa-check-double"></i> Accept All Pending
+                </button>
+                <button class="bulk-btn" id="markAllProcessingBtn">
+                    <i class="fas fa-cogs"></i> Mark All as Processing
+                </button>
+                <button class="bulk-btn" id="exportOrdersBtn">
+                    <i class="fas fa-file-export"></i> Export Orders
+                </button>
+                <button class="bulk-btn danger" id="clearOldOrdersBtn">
+                    <i class="fas fa-trash"></i> Clear Old Orders
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div class="notifications-panel" id="notificationsPanel">
+        <div class="notifications-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="close-notifications" id="closeNotificationsBtn">&times;</button>
+        </div>
+        <div class="notifications-list" id="notificationsList">
+            <!-- Notifications will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Admin Settings</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">General</button>
+                    <button class="tab-btn" data-tab="password">Password</button>
+                    <button class="tab-btn" data-tab="store">Store Info</button>
+                </div>
+
+                <div class="settings-content">
+                    <!-- General Settings -->
+                    <div class="tab-content active" id="generalTab">
+                        <div class="setting-group">
+                            <label>Auto-refresh Interval</label>
+                            <select id="refreshInterval">
+                                <option value="30000">30 seconds</option>
+                                <option value="60000">1 minute</option>
+                                <option value="300000">5 minutes</option>
+                                <option value="0">Manual only</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="soundNotifications" checked>
+                                Enable Sound Notifications
+                            </label>
+                        </div>
+                        <div class="setting-group">
+                            <label>
+                                <input type="checkbox" id="desktopNotifications" checked>
+                                Enable Desktop Notifications
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Password Settings -->
+                    <div class="tab-content" id="passwordTab">
+                        <div class="setting-group">
+                            <label>Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="Enter current password">
+                        </div>
+                        <div class="setting-group">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter new password">
+                        </div>
+                        <div class="setting-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Confirm new password">
+                        </div>
+                        <button class="save-btn" id="savePasswordBtn">Change Password</button>
+                    </div>
+
+                    <!-- Store Settings -->
+                    <div class="tab-content" id="storeTab">
+                        <div class="setting-group">
+                            <label>Store Name</label>
+                            <input type="text" id="storeNameInput" placeholder="Enter store name">
+                        </div>
+                        <div class="setting-group">
+                            <label>Store Phone</label>
+                            <input type="tel" id="storePhoneInput" placeholder="Enter store phone">
+                        </div>
+                        <div class="setting-group">
+                            <label>Store Address</label>
+                            <textarea id="storeAddressInput" placeholder="Enter store address" rows="3"></textarea>
+                        </div>
+                        <button class="save-btn" id="saveStoreInfoBtn">Save Store Info</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3 id="confirmationTitle">Confirm Action</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+                <div class="modal-actions">
+                    <button class="cancel-btn" id="cancelActionBtn">Cancel</button>
+                    <button class="confirm-btn" id="confirmActionBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>

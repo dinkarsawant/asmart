@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - AS Mart</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles for orders page */
+        :root { --primary: #ffcc00; --accent: #ff5722; }
+        
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-tab.active {
+            background: var(--primary);
+            color: #000;
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .order-id { font-weight: bold; color: #333; font-size: 1.1rem; }
+        .order-date { color: #666; font-size: 0.9rem; }
+        
+        .order-status {
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+        
+        .status-pending { background: #FFF3CD; color: #856404; }
+        .status-preparing { background: #D4EDDA; color: #155724; }
+        .status-delivered { background: #E8F5E9; color: #1B5E20; }
+        .status-cancelled { background: #F8D7DA; color: #721C24; }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #EEE;
+        }
+        
+        .order-total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-top: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%; max-width: 500px;
+            max-height: 80vh; overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AS <span>Mart</span></h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="shop.html"><i class="fas fa-store"></i> Shop</a></li>
+                <li><a href="orders.html" class="active"><i class="fas fa-clipboard-list"></i> Orders</a></li>
+                <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Track</a></li>
+                <li><a href="reviews.html"><i class="fas fa-star"></i> Reviews</a></li>
+            </ul>
+            
+            <div class="nav-right">
+                <div class="cart-icon" onclick="location.href='cart.html'">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </div>
+                <div class="user-profile" id="userProfile" style="cursor: pointer;" onclick="handleAuthAction()">
+                    <div class="user-avatar" id="userAvatar" style="background: var(--primary); color: #000; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">G</div>
+                    <span id="userName" style="margin-left: 10px;">Guest</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="orders-header">
+            <h2 class="section-title"><i class="fas fa-clipboard-list"></i> My Orders</h2>
+            
+            <div class="filter-tabs">
+                <div class="filter-tab active" onclick="filterOrders('all')">All Orders</div>
+                <div class="filter-tab" onclick="filterOrders('pending')">Pending</div>
+                <div class="filter-tab" onclick="filterOrders('preparing')">Preparing</div>
+                <div class="filter-tab" onclick="filterOrders('delivered')">Delivered</div>
+                <div class="filter-tab" onclick="filterOrders('cancelled')">Cancelled</div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="location.href='shop.html'" style="background: var(--primary); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                <i class="fas fa-plus"></i> New Order
+            </button>
+        </div>
+        
+        <div id="ordersContainer">
+            <p style="text-align: center; padding: 40px;">Checking authentication...</p>
+        </div>
+        
+        <!-- Order Details Modal -->
+        <div id="orderDetailsModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal('orderDetailsModal')" style="float: right; cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <h2>Order Details</h2>
+                <div id="orderDetailsContent"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container" style="text-align: center; padding: 20px 0; border-top: 1px solid #eee; margin-top: 50px;">
+            <p>&copy; 2024 AS Mart. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- FIREBASE SDKS (Version 8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+        // 1. INITIALIZE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyDw1RHr6fmnC5opJ5j87sRwQNxMDAYA-Ug",
+            authDomain: "asmart-70cfc.firebaseapp.com",
+            projectId: "asmart-70cfc",
+            storageBucket: "asmart-70cfc.firebasestorage.app",
+            messagingSenderId: "631864173433",
+            appId: "1:631864173433:web:0be2ebbd828c62555505a8",
+            measurementId: "G-Q62833ET3Y"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentFilter = 'all';
+
+        // 2. AUTHENTICATION LOGIC
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('userName').textContent = user.displayName || user.email.split('@')[0];
+                document.getElementById('userAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                loadUserOrders(user.uid);
+            } else {
+                window.location.href = 'login.html'; // Redirect to login if not signed in
+            }
+        });
+
+        function handleAuthAction() {
+            if(confirm("Do you want to log out?")) {
+                auth.signOut().then(() => window.location.href = 'login.html');
+            }
+        }
+
+        // 3. FETCH ORDERS
+        function loadUserOrders(uid) {
+            const container = document.getElementById('ordersContainer');
+            container.innerHTML = '<p style="text-align: center;">Loading orders...</p>';
+            
+            let query = db.collection('orders').where('userId', '==', uid);
+            
+            if (currentFilter !== 'all') {
+                query = query.where('status', '==', currentFilter);
+            }
+
+            // Note: query.orderBy('timestamp', 'desc') requires a manual index in Firebase console
+            query.get().then(snapshot => {
+                container.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding: 50px;">
+                            <i class="fas fa-box-open" style="font-size: 3rem; color: #ccc;"></i>
+                            <p style="margin-top: 15px;">No orders found in this category.</p>
+                        </div>`;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const order = doc.data();
+                    const orderId = doc.id;
+                    const date = order.timestamp ? order.timestamp.toDate().toLocaleString() : 'Recent';
+                    
+                    container.innerHTML += `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-id">Order #${orderId.slice(0,8)}</div>
+                                    <div class="order-date">${date}</div>
+                                </div>
+                                <div class="order-status status-${order.status || 'pending'}">
+                                    ${order.status || 'pending'}
+                                </div>
+                            </div>
+                            <div class="order-summary">
+                                <span>${(order.items || []).length} items</span>
+                            </div>
+                            <div class="order-total">Total: $${order.total ? order.total.toFixed(2) : '0.00'}</div>
+                            <div class="order-actions">
+                                <button class="btn" style="background:#eee; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;" onclick="viewOrderDetails('${orderId}')">
+                                    <i class="fas fa-eye"></i> Details
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }).catch(error => {
+                console.error("Firestore Error:", error);
+                container.innerHTML = '<p style="color:red; text-align:center;">Error loading orders. Check console.</p>';
+            });
+        }
+
+        // 4. ORDER ACTIONS & MODAL
+        function viewOrderDetails(orderId) {
+            db.collection('orders').doc(orderId).get().then(doc => {
+                if (doc.exists) {
+                    const order = doc.data();
+                    const itemsHtml = (order.items || []).map(item => `
+                        <div class="order-item">
+                            <span>${item.name} x${item.quantity}</span>
+                            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('orderDetailsContent').innerHTML = `
+                        <div style="margin-top: 15px;">
+                            <p><strong>Status:</strong> <span class="order-status status-${order.status}">${order.status}</span></p>
+                            <p><strong>Delivery Address:</strong><br>${order.address || 'Not provided'}</p>
+                            <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                                ${itemsHtml}
+                            </div>
+                            <h3 style="text-align: right;">Total: $${order.total?.toFixed(2)}</h3>
+                            <div style="display:flex; gap: 10px; margin-top: 20px;">
+                                <button onclick="window.location.href='tracking.html?id=${orderId}'" style="flex:1; padding:10px; background:var(--primary); border:none; border-radius:5px; cursor:pointer;">Track Order</button>
+                                ${order.status === 'pending' ? `<button onclick="cancelOrder('${doc.id}')" style="flex:1; padding:10px; background:#ff4444; color:white; border:none; border-radius:5px; cursor:pointer;">Cancel</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    openModal('orderDetailsModal');
+                }
+            });
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm("Are you sure you want to cancel this order?")) {
+                db.collection('orders').doc(orderId).update({ status: 'cancelled' })
+                .then(() => {
+                    alert("Order Cancelled");
+                    closeModal('orderDetailsModal');
+                    loadUserOrders(auth.currentUser.uid);
+                });
+            }
+        }
+
+        function filterOrders(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.textContent.toLowerCase().includes(filter));
+            });
+            if (auth.currentUser) loadUserOrders(auth.currentUser.uid);
+        }
+
+        // 5. UI UTILITIES
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            document.querySelector('.cart-count').textContent = cart.reduce((total, item) => total + item.quantity, 0);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') closeModal(event.target.id);
+        }
+
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+    </script>
+</body>
+</html>

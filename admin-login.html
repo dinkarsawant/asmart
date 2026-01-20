@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AS Mart Admin Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            font-size: 48px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .store-name {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background: #fee;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            font-size: 14px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            border: 1px solid #e9ecef;
+        }
+        
+        .instructions h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .back-to-store {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .back-to-store a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s;
+        }
+        
+        .back-to-store a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .password-hint {
+            display: block;
+            margin-top: 5px;
+            color: #7f8c8d;
+            font-size: 12px;
+            font-style: italic;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .forgot-password a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .store-name {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🔐</div>
+        <h2 class="store-name">AS Mart Admin Panel</h2>
+        <p class="subtitle">Store Owner Login</p>
+        
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="adminPassword">
+                  Enter Admin Password
+               
+                </label>
+                <input type="password" id="adminPassword" placeholder="Enter your admin password" required>
+            </div>
+            
+            <div id="errorMessage" class="error-message">
+                <i class="fas fa-exclamation-circle"></i> Incorrect password! Please try again.
+            </div>
+            
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+            </button>
+        </form>
+        
+        <div class="instructions">
+            <h4>Admin Access Information:</h4>
+            <ul>
+             
+                <li><strong>Access Level:</strong> Store Owner Only</li>
+                <li><strong>Permissions:</strong> View all orders, customer details, and addresses</li>
+                <li><strong>Actions:</strong> Accept/Reject orders, update order status</li>
+                <li><strong>Security:</strong> Password stored in your browser only</li>
+            </ul>
+        </div>
+        
+        <div class="back-to-store">
+            <a href="index.html">
+                <i class="fas fa-arrow-left"></i> Back to AS Mart Store
+            </a>
+        </div>
+    </div>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        // Check if already logged in
+        if (sessionStorage.getItem('asmartAdminLoggedIn') === 'true') {
+            const loginTime = parseInt(sessionStorage.getItem('asmartAdminLoginTime') || '0');
+            const eightHours = 8 * 60 * 60 * 1000;
+            
+            if (Date.now() - loginTime < eightHours) {
+                // Still logged in, redirect to dashboard
+                window.location.href = 'admin.html';
+            } else {
+                // Session expired
+                sessionStorage.removeItem('asmartAdminLoggedIn');
+                sessionStorage.removeItem('asmartAdminLoginTime');
+            }
+        }
+        
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('adminPassword').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const submitBtn = this.querySelector('.login-btn');
+            
+            // Save original button text
+            const originalBtnHTML = submitBtn.innerHTML;
+            
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            submitBtn.disabled = true;
+            
+            // Simulate network delay for better UX
+            setTimeout(() => {
+                // Check password (default: admin123)
+                const savedPassword = localStorage.getItem('asmartAdminPassword') || 'admin123';
+                
+                if (password === savedPassword) {
+                    // Store login session
+                    sessionStorage.setItem('asmartAdminLoggedIn', 'true');
+                    sessionStorage.setItem('asmartAdminLoginTime', Date.now());
+                    
+                    // Save store info if not exists
+                    if (!localStorage.getItem('asmartStoreName')) {
+                        localStorage.setItem('asmartStoreName', 'AS Mart');
+                    }
+                    
+                    // Show success message
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Login Successful!';
+                    submitBtn.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
+                    
+                } else {
+                    // Show error
+                    errorMessage.style.display = 'block';
+                    errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Incorrect password! Please try again.';
+                    document.getElementById('adminPassword').style.borderColor = '#e74c3c';
+                    
+                    // Reset button
+                    submitBtn.innerHTML = originalBtnHTML;
+                    submitBtn.disabled = false;
+                    
+                    // Clear error after 5 seconds
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                        document.getElementById('adminPassword').style.borderColor = '#e0e0e0';
+                    }, 5000);
+                    
+                    // Clear password field
+                    document.getElementById('adminPassword').value = '';
+                    document.getElementById('adminPassword').focus();
+                }
+            }, 800); // Simulated delay
+        });
+        
+        // Focus on password input
+        document.getElementById('adminPassword').focus();
+        
+        // Add Enter key support
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('adminLoginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+        
+        // Add input event to clear error when typing
+        document.getElementById('adminPassword').addEventListener('input', function() {
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage.style.display !== 'none') {
+                errorMessage.style.display = 'none';
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+    </script>
+</body>
+</html>
